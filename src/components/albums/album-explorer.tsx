@@ -6,7 +6,6 @@ import { LoaderCircle, Music } from "lucide-react";
 import { AlbumCard } from "./album-card";
 import { Button } from "@/components/ui/button";
 import type { Album } from "@/lib/types";
-import { mockGetAllAlbums } from "@/lib/mocks";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 
 interface AlbumExplorerProps {
@@ -15,15 +14,17 @@ interface AlbumExplorerProps {
 }
 
 export function AlbumExplorer({ 
-  title = "All Albums", 
+  title = "Todos los álbumes", 
   description 
 }: AlbumExplorerProps = {}) {
   // Infinite scroll for all albums
   const loadMoreAlbums = useCallback(async (page: number) => {
-    const result = await mockGetAllAlbums(page, 12);
+    const res = await fetch(`/api/albums/rock?page=${page}&limit=12`);
+    if (!res.ok) throw new Error('Error al cargar álbumes');
+    const result = await res.json();
     return {
-      data: result.albums,
-      hasMore: result.hasMore,
+      data: result.albums as Album[],
+      hasMore: result.albums.length === 12, // Si la página está llena, puede haber más
       page: result.page
     };
   }, []);
@@ -37,12 +38,15 @@ export function AlbumExplorer({
     loadingRef
   } = useInfiniteScroll(loadMoreAlbums);
 
+  // Filtrar álbumes duplicados por id
+  const uniqueAlbums = Array.from(new Map(albums.map(a => [a.id, a])).values());
+
   if (error) {
     return (
       <div className="text-center py-20 bg-destructive/10 rounded-lg border border-destructive/20">
         <p className="text-destructive mb-4">Error: {error}</p>
         <Button variant="outline" onClick={() => reset()}>
-          Try Again
+          Intentar de nuevo
         </Button>
       </div>
     );
@@ -52,12 +56,12 @@ export function AlbumExplorer({
     return (
       <div className="text-center py-20 bg-accent/50 rounded-lg border-2 border-dashed">
         <Music className="mx-auto h-16 w-16 text-muted-foreground" />
-        <h3 className="mt-4 text-2xl font-semibold font-headline">No albums found</h3>
+        <h3 className="mt-4 text-2xl font-semibold font-headline">No se encontraron álbumes</h3>
         <p className="mt-2 text-muted-foreground">
-          There was an error loading the albums.
+          Hubo un error al cargar los álbumes.
         </p>
         <Button variant="outline" className="mt-6" onClick={() => reset()}>
-          Reload
+          Recargar
         </Button>
       </div>
     );
@@ -68,7 +72,7 @@ export function AlbumExplorer({
       <div className="flex items-center gap-2 mb-6">
         <Music className="h-5 w-5 text-primary" />
         <h2 className="text-2xl font-headline font-bold">{title}</h2>
-        <span className="text-sm text-muted-foreground">({albums.length} loaded)</span>
+        <span className="text-sm text-muted-foreground">({albums.length} cargados)</span>
       </div>
       
       {description && (
@@ -76,7 +80,7 @@ export function AlbumExplorer({
       )}
       
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {albums.map((album) => (
+        {uniqueAlbums.map((album) => (
           <AlbumCard key={album.id} album={album} variant="search" />
         ))}
       </div>
@@ -87,7 +91,7 @@ export function AlbumExplorer({
           {isLoading && (
             <div className="flex items-center justify-center gap-2">
               <LoaderCircle className="h-6 w-6 animate-spin text-primary" />
-              <span className="text-muted-foreground">Loading more albums...</span>
+              <span className="text-muted-foreground">Cargando más álbumes...</span>
             </div>
           )}
         </div>
@@ -96,7 +100,7 @@ export function AlbumExplorer({
       {/* End of results indicator */}
       {!hasMore && albums.length > 0 && (
         <div className="text-center py-8">
-          <p className="text-muted-foreground">You've reached the end! All albums loaded.</p>
+          <p className="text-muted-foreground">¡Has llegado al final! Todos los álbumes han sido cargados.</p>
         </div>
       )}
     </div>

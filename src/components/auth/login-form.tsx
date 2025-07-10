@@ -22,8 +22,8 @@ import { useToast } from "@/hooks/use-toast";
 import { LoaderCircle } from "lucide-react";
 
 const formSchema = z.object({
-  email: z.string().min(1, { message: "Email is required." }).email({ message: "Invalid email address." }),
-  password: z.string().min(1, { message: "Password is required." }).min(6, { message: "Password must be at least 6 characters." }),
+  email: z.string().min(1, { message: "El correo es obligatorio." }).email({ message: "Correo electrónico inválido." }),
+  password: z.string().min(1, { message: "La contraseña es obligatoria." }).min(6, { message: "La contraseña debe tener al menos 6 caracteres." }),
 });
 
 export function LoginForm() {
@@ -69,9 +69,9 @@ export function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Correo electrónico</FormLabel>
                   <FormControl>
-                    <Input placeholder="you@example.com" {...field} />
+                    <Input placeholder="tucorreo@ejemplo.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -82,7 +82,7 @@ export function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Contraseña</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
@@ -94,13 +94,13 @@ export function LoginForm() {
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-              Sign In
+              Iniciar sesión
             </Button>
             <div className="text-center space-y-2">
               <p className="text-sm text-muted-foreground">
-                Don't have an account?{" "}
+                ¿No tienes una cuenta?{" "}
                 <Button variant="link" asChild className="p-0 h-auto">
-                  <Link href="/signup">Sign up</Link>
+                  <Link href="/signup">Regístrate</Link>
                 </Button>
               </p>
               <p className="text-xs text-muted-foreground">

@@ -88,3 +88,10 @@ model Favorite {
   @@unique([userId, albumId])
   @@map("favorites")
 }
+
+model RockKeyword {
+  id      String @id @default(uuid())
+  keyword String @unique
+
+  @@map("rock_keywords")
+}
