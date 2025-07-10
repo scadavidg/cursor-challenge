@@ -1,19 +1,31 @@
 "use client";
 
-import { AlbumSearch } from "@/components/albums/album-search";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
+import { LoaderCircle } from "lucide-react";
 
 export default function Home() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (isAuthenticated) {
+        router.push('/home');
+      } else {
+        router.push('/login');
+      }
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  // Show loading spinner while checking authentication
   return (
-    <div className="container mx-auto animate-fade-in">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-6xl font-headline font-bold mb-2">
-          Discover Your Next Favorite Album
-        </h1>
-        <p className="text-lg md:text-xl text-muted-foreground">
-          Search for any album and add it to your personal collection.
-        </p>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center gap-2">
+        <LoaderCircle className="h-6 w-6 animate-spin" />
+        <span>Loading...</span>
       </div>
-      <AlbumSearch />
     </div>
   );
 }

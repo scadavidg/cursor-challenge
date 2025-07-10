@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (token: string) => void;
+  login: (email: string, password: string) => void;
   logout: () => void;
   isLoading: boolean;
 }
@@ -49,15 +49,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  const login = (email?: string, password?: string) => {
-    // Hardcode a temporary user for testing
-    if (email === 'test@gmail.com' && password === 'test') {
-      setCookie("session-token", "test-token", 1); // Use a dummy token for the hardcoded user
-    } else if (email && password === undefined) { // Handle token-based login if needed in the future
-      setCookie("session-token", email, 1);
+  const login = (email: string, password: string) => {
+    // Basic validation for test user
+    if (!email || !password) {
+      throw new Error('Email and password are required');
     }
-    setIsAuthenticated(true);
-    router.push('/dashboard');
+
+    // Hardcode a temporary user for testing
+    if (email === 'test@gmail.com' && password === 'testing') {
+      setCookie("session-token", "test-token", 1); // Use a dummy token for the hardcoded user
+      setIsAuthenticated(true);
+      router.push('/home');
+    } else {
+      // In a real app, you would validate credentials with your API
+      throw new Error('Invalid credentials. Use test@gmail.com / testing');
+    }
   };
 
   const logout = () => {

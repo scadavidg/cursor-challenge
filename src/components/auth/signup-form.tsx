@@ -45,14 +45,17 @@ export function SignUpForm() {
     setIsLoading(true);
     // Simulate API call
     setTimeout(() => {
-       // In a real app, you would create the user and get a token
-      const mockToken = `fake-token-for-${values.email}`;
-      login(mockToken);
+      // For demo purposes, we'll just redirect to login
+      // In a real app, you would create the user and then log them in
       toast({
         title: "Account Created!",
-        description: "Welcome to TuneStack!",
+        description: "Please sign in with your new account.",
       });
       setIsLoading(false);
+      // Redirect to login after a short delay
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 1000);
     }, 1500);
   }
 

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Heart, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 import type { Album } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,9 @@ export function AlbumCard({ album, variant = "search" }: AlbumCardProps) {
   const { toast } = useToast();
   const isAlbumFavorite = isFavorite(album.id);
 
+  // Estado para manejar el src de la imagen
+  const [imgSrc, setImgSrc] = useState(album.coverArt);
+
   const handleAdd = () => {
     addFavorite(album);
     toast({ title: "Added to favorites!", description: `"${album.title}" has been saved.` });
@@ -33,12 +37,13 @@ export function AlbumCard({ album, variant = "search" }: AlbumCardProps) {
     <Card className="flex flex-col overflow-hidden h-full transition-transform transform hover:-translate-y-1 hover:shadow-xl">
       <CardHeader className="p-0">
         <Image
-          src={album.coverArt}
+          src={imgSrc}
           alt={`Cover art for ${album.title}`}
           width={400}
           height={400}
           className="w-full h-auto aspect-square object-cover"
           data-ai-hint="album cover"
+          onError={() => setImgSrc("/default-album.png")}
         />
       </CardHeader>
       <CardContent className="p-4 flex-1">

@@ -22,8 +22,8 @@ import { useToast } from "@/hooks/use-toast";
 import { LoaderCircle } from "lucide-react";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  email: z.string().min(1, { message: "Email is required." }).email({ message: "Invalid email address." }),
+  password: z.string().min(1, { message: "Password is required." }).min(6, { message: "Password must be at least 6 characters." }),
 });
 
 export function LoginForm() {
@@ -41,17 +41,22 @@ export function LoginForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      // In a real app, you would get a token from your API
-      const mockToken = `fake-token-for-${values.email}`;
-      login(mockToken);
+    
+    try {
+      login(values.email, values.password);
       toast({
         title: "Login Successful",
         description: "Welcome back!",
       });
+    } catch (error: any) {
+      toast({
+        title: "Login Failed",
+        description: error.message || "Invalid credentials. Use test@gmail.com / testing",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   }
 
   return (
@@ -91,12 +96,17 @@ export function LoginForm() {
               {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
               Sign In
             </Button>
-            <p className="text-sm text-muted-foreground">
-              Don't have an account?{" "}
-              <Button variant="link" asChild className="p-0 h-auto">
-                <Link href="/signup">Sign up</Link>
-              </Button>
-            </p>
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Don't have an account?{" "}
+                <Button variant="link" asChild className="p-0 h-auto">
+                  <Link href="/signup">Sign up</Link>
+                </Button>
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Demo credentials: test@gmail.com / testing
+              </p>
+            </div>
           </CardFooter>
         </form>
       </Form>
