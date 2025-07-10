@@ -1,4 +1,4 @@
-# **App Name**: TuneStack
+# **App Name**: RockStack
 
 ## Core Features:
 

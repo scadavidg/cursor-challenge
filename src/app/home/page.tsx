@@ -16,7 +16,7 @@ export default function HomePage() {
           Descubre tu próximo álbum favorito
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground">
-          Explora nuestra colección de rock o busca álbumes específicos.
+          Explora nuestra colección de álbumes asociados al rock.
         </p>
       </div>
 

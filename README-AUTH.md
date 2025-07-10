@@ -1,4 +1,4 @@
-# Sistema de Autenticación - TuneStack
+# Sistema de Autenticación - RockStack
 
 ## 🚀 Configuración Completa
 

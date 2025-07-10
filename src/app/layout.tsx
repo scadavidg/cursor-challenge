@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import SessionProvider from "@/components/SessionProvider";
 import { AuthProvider } from "@/contexts/auth-context";
-import { FavoritesProvider } from "@/contexts/favorites-context";
 import { Header } from "@/components/header";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "TuneStack",
+  title: "RockStack",
   description: "Search and save your favorite albums.",
 };
 
@@ -26,15 +25,13 @@ export default function RootLayout({
       <body className="font-body antialiased h-full">
         <SessionProvider>
           <AuthProvider>
-            <FavoritesProvider>
-              <div className="flex flex-col h-full">
-                <Header />
-                <main className="flex-1 overflow-y-auto p-4 md:p-8">
-                  {children}
-                </main>
-              </div>
-              <Toaster />
-            </FavoritesProvider>
+            <div className="flex flex-col h-full">
+              <Header />
+              <main className="flex-1 overflow-y-auto p-4 md:p-8">
+                {children}
+              </main>
+            </div>
+            <Toaster />
           </AuthProvider>
         </SessionProvider>
       </body>
