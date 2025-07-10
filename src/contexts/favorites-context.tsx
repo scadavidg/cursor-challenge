@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type { Album } from "@/lib/types";
-import { mockAlbumsDatabase } from "@/lib/mocks";
 
 interface FavoritesContextType {
   favorites: Album[];
@@ -14,14 +13,6 @@ interface FavoritesContextType {
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
 
-// Sample favorites for new users
-const sampleFavorites: Album[] = [
-  mockAlbumsDatabase.find(album => album.id === "1")!, // Abbey Road
-  mockAlbumsDatabase.find(album => album.id === "17")!, // Thriller
-  mockAlbumsDatabase.find(album => album.id === "33")!, // OK Computer
-  mockAlbumsDatabase.find(album => album.id === "49")!, // To Pimp A Butterfly
-];
-
 export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   const [favorites, setFavorites] = useState<Album[]>([]);
 
@@ -32,8 +23,8 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
         setFavorites(JSON.parse(storedFavorites));
       } else {
         // Add sample favorites for new users
-        setFavorites(sampleFavorites);
-        updateLocalStorage(sampleFavorites);
+        // setFavorites(sampleFavorites); // Eliminar sampleFavorites y su uso. Inicializar favoritos como [] por defecto.
+        updateLocalStorage([]);
       }
     } catch (error) {
       console.error("Failed to parse favorites from localStorage", error);
@@ -70,9 +61,9 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
 
   const addSampleFavorites = () => {
     setFavorites((prevFavorites) => {
-      const newFavorites = [...prevFavorites, ...sampleFavorites];
-      updateLocalStorage(newFavorites);
-      return newFavorites;
+      // const newFavorites = [...prevFavorites, ...sampleFavorites]; // Eliminar sampleFavorites y su uso. Inicializar favoritos como [] por defecto.
+      updateLocalStorage([]);
+      return [];
     });
   };
 

@@ -22,9 +22,9 @@ import { useToast } from "@/hooks/use-toast";
 import { LoaderCircle } from "lucide-react";
 
 const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  name: z.string().min(2, { message: "El nombre debe tener al menos 2 caracteres." }),
+  email: z.string().email({ message: "Correo electrónico inválido." }),
+  password: z.string().min(6, { message: "La contraseña debe tener al menos 6 caracteres." }),
 });
 
 export function SignUpForm() {
@@ -90,9 +90,9 @@ export function SignUpForm() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Nombre</FormLabel>
                   <FormControl>
-                    <Input placeholder="Your Name" {...field} />
+                    <Input placeholder="Tu nombre" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -103,9 +103,9 @@ export function SignUpForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Correo electrónico</FormLabel>
                   <FormControl>
-                    <Input placeholder="you@example.com" {...field} />
+                    <Input placeholder="tucorreo@ejemplo.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -116,7 +116,7 @@ export function SignUpForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Contraseña</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
@@ -128,12 +128,12 @@ export function SignUpForm() {
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-              Create Account
+              Crear cuenta
             </Button>
             <p className="text-sm text-muted-foreground">
-              Already have an account?{" "}
+              ¿Ya tienes una cuenta?{" "}
               <Button variant="link" asChild className="p-0 h-auto">
-                 <Link href="/login">Sign In</Link>
+                 <Link href="/login">Iniciar sesión</Link>
               </Button>
             </p>
           </CardFooter>

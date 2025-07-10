@@ -5,7 +5,6 @@ import { LoaderCircle, Music } from "lucide-react";
 
 import { AlbumCard } from "./album-card";
 import type { Album } from "@/lib/types";
-import { mockGetAllAlbums } from "@/lib/mocks";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 
 interface FeaturedAlbumsProps {
@@ -14,19 +13,17 @@ interface FeaturedAlbumsProps {
 }
 
 export function FeaturedAlbums({ 
-  title = "Featured Albums", 
+  title = "Álbumes destacados", 
   description 
 }: FeaturedAlbumsProps = {}) {
-  // Log para saber si el componente se monta
-  console.log("FeaturedAlbums mounted");
-
   // Infinite scroll for all albums (paginated)
   const loadMoreAlbums = useCallback(async (page: number) => {
-    console.log("loadMoreAlbums called with page:", page);
-    const result = await mockGetAllAlbums(page, 12);
+    const res = await fetch(`/api/albums/rock?page=${page}&limit=12`);
+    if (!res.ok) throw new Error('Error al cargar álbumes');
+    const result = await res.json();
     return {
-      data: result.albums,
-      hasMore: result.hasMore,
+      data: result.albums as Album[],
+      hasMore: result.albums.length === 12,
       page: result.page
     };
   }, []);
@@ -48,12 +45,15 @@ export function FeaturedAlbums({
     }
   }, [albums.length, isLoading, hasMore, loadMore]);
 
+  // Filtrar álbumes duplicados por id
+  const uniqueAlbums = Array.from(new Map(albums.map(a => [a.id, a])).values());
+
   if (error) {
     return (
       <div className="text-center py-20 bg-destructive/10 rounded-lg border border-destructive/20">
         <p className="text-destructive mb-4">Error: {error}</p>
         <button className="btn" onClick={() => reset()}>
-          Try Again
+          Intentar de nuevo
         </button>
       </div>
     );
@@ -63,12 +63,12 @@ export function FeaturedAlbums({
     return (
       <div className="text-center py-20 bg-accent/50 rounded-lg border-2 border-dashed">
         <Music className="mx-auto h-16 w-16 text-muted-foreground" />
-        <h3 className="mt-4 text-2xl font-semibold font-headline">No albums found</h3>
+        <h3 className="mt-4 text-2xl font-semibold font-headline">No se encontraron álbumes</h3>
         <p className="mt-2 text-muted-foreground">
-          There was an error loading the albums.
+          Hubo un error al cargar los álbumes.
         </p>
         <button className="btn mt-6" onClick={() => reset()}>
-          Reload
+          Recargar
         </button>
       </div>
     );
@@ -79,7 +79,7 @@ export function FeaturedAlbums({
       <div className="flex items-center gap-2 mb-6">
         <Music className="h-5 w-5 text-primary" />
         <h2 className="text-2xl font-headline font-bold">{title}</h2>
-        <span className="text-sm text-muted-foreground">({albums.length} loaded)</span>
+        <span className="text-sm text-muted-foreground">({albums.length} cargados)</span>
       </div>
       
       {description && (
@@ -87,7 +87,7 @@ export function FeaturedAlbums({
       )}
       
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {albums.map((album) => (
+        {uniqueAlbums.map((album) => (
           <AlbumCard key={album.id} album={album} variant="search" />
         ))}
       </div>
@@ -98,7 +98,7 @@ export function FeaturedAlbums({
           {isLoading && (
             <div className="flex items-center justify-center gap-2">
               <LoaderCircle className="h-6 w-6 animate-spin text-primary" />
-              <span className="text-muted-foreground">Loading more albums...</span>
+              <span className="text-muted-foreground">Cargando más álbumes...</span>
             </div>
           )}
         </div>
@@ -107,7 +107,7 @@ export function FeaturedAlbums({
       {/* End of results indicator */}
       {!hasMore && albums.length > 0 && (
         <div className="text-center py-8">
-          <p className="text-muted-foreground">You've seen all albums!</p>
+          <p className="text-muted-foreground">¡Has visto todos los álbumes!</p>
         </div>
       )}
     </div>

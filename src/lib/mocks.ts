@@ -200,7 +200,6 @@ export const mockSearchAlbums = async (query: string, page: number = 1, limit: n
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 400));
   
-  console.log("[mockSearchAlbums] Query received:", query, "Page:", page, "Limit:", limit);
 
   if (!query.trim()) {
     return {
@@ -219,7 +218,6 @@ export const mockSearchAlbums = async (query: string, page: number = 1, limit: n
     album.artist.toLowerCase().includes(searchTerm)
   );
 
-  console.log("[mockSearchAlbums] Results found:", allResults.length);
 
   // Add some randomness to make it feel more realistic
   let results = allResults;
@@ -273,18 +271,6 @@ export const mockGetAllAlbums = async (page: number = 1, limit: number = 12): Pr
   const endIndex = startIndex + limit;
   const paginatedResults = mockAlbumsDatabase.slice(startIndex, endIndex);
   const hasMore = endIndex < mockAlbumsDatabase.length;
-
-  // Log para depuración
-  console.log({
-    page,
-    limit,
-    startIndex,
-    endIndex,
-    total: mockAlbumsDatabase.length,
-    paginatedResultsCount: paginatedResults.length,
-    firstAlbum: paginatedResults[0],
-    lastAlbum: paginatedResults[paginatedResults.length - 1]
-  });
 
   return {
     albums: paginatedResults,

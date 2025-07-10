@@ -13,10 +13,10 @@ export default function HomePage() {
     <div className="container mx-auto animate-fade-in">
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-6xl font-headline font-bold mb-2">
-          Discover Your Next Favorite Album
+          Descubre tu próximo álbum favorito
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground">
-          Explore our collection or search for specific albums.
+          Explora nuestra colección de rock o busca álbumes específicos.
         </p>
       </div>
 
@@ -30,7 +30,7 @@ export default function HomePage() {
             className="flex items-center gap-2"
           >
             <Music className="h-4 w-4" />
-            Explore All Albums
+            Explorar todos los álbumes
           </Button>
           <Button
             variant={activeTab === 'search' ? 'default' : 'ghost'}
@@ -39,7 +39,7 @@ export default function HomePage() {
             className="flex items-center gap-2"
           >
             <Search className="h-4 w-4" />
-            Search Albums
+            Buscar álbumes
           </Button>
         </div>
       </div>
@@ -47,8 +47,8 @@ export default function HomePage() {
       {/* Content */}
       {activeTab === 'explore' ? (
         <FeaturedAlbums 
-          title="Featured Albums" 
-          description="Scroll down to discover more albums from our collection. Click the heart icon to add albums to your favorites!"
+          title="Álbumes destacados" 
+          description="Desplázate hacia abajo para descubrir más álbumes de rock. ¡Haz clic en el ícono de corazón para agregarlos a tus favoritos!"
         />
       ) : (
         <AlbumSearch />

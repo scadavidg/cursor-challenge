@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Search, LoaderCircle, TrendingUp, Trash2, X } from "lucide-react";
+import { Search, LoaderCircle, Trash2, X } from "lucide-react";
 import clsx from "clsx";
 
 import { Button } from "@/components/ui/button";
@@ -13,57 +13,53 @@ import { Input } from "@/components/ui/input";
 import { AlbumCard } from "./album-card";
 import { SearchSuggestions } from "./search-suggestions";
 import type { Album } from "@/lib/types";
-import { mockSearchAlbums, mockGetTrendingAlbums } from "@/lib/mocks";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 
 const searchFormSchema = z.object({
-  query: z.string().min(1, { message: "Please enter something to search." }),
+  query: z.string().min(1, { message: "Por favor ingresa algo para buscar." }),
 });
 
+const ROCK_MESSAGES = [
+  "¡Solo aceptamos rock! Intenta con algo más ruidoso 🤘",
+  "¿Pop? ¿Reggaetón? Aquí solo suena el rock, baby.",
+  "¡Eso no es rock! Prueba con AC/DC, Queen o Nirvana.",
+  "¡Ups! Este escenario es solo para rockstars. Busca algo más rockero.",
+  "¡Prohibido el reggaetón! Aquí solo guitarras eléctricas y baterías.",
+  "¡No encontramos nada! Pero si fuera rock, seguro sí. 🤟",
+  "¡Eso no es suficientemente ruidoso! Solo aceptamos rock del bueno.",
+  "¿Intentando colar algo que no es rock? ¡No en mi guardia!",
+  "¡Aquí solo se permiten riffs y solos de guitarra!",
+  "¡Eso no es rock! Pero puedes intentarlo con Led Zeppelin, The Beatles o Pink Floyd."
+];
+
 export function AlbumSearch() {
-  const [trendingAlbums, setTrendingAlbums] = useState<Album[]>([]);
-  const [isLoadingTrending, setIsLoadingTrending] = useState(true);
   const [hasSearched, setHasSearched] = useState(false);
   const [currentQuery, setCurrentQuery] = useState("");
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const [funMessage, setFunMessage] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof searchFormSchema>>({
     resolver: zodResolver(searchFormSchema),
     defaultValues: { query: "" },
   });
 
-  // Load trending albums on component mount
-  useEffect(() => {
-    const loadTrendingAlbums = async () => {
-      try {
-        const trending = await mockGetTrendingAlbums();
-        setTrendingAlbums(trending);
-      } catch (error) {
-        console.error('Failed to load trending albums:', error);
-      } finally {
-        setIsLoadingTrending(false);
-      }
-    };
-
-    loadTrendingAlbums();
-  }, []);
-
   // Infinite scroll for search results
   const loadMoreSearchResults = useCallback(async (page: number) => {
     if (!currentQuery.trim()) {
       return { data: [], hasMore: false, page };
     }
-    
-    const result = await mockSearchAlbums(currentQuery, page, 12);
+    const res = await fetch(`/api/albums/search?query=${encodeURIComponent(currentQuery)}&page=${page}&limit=12`);
+    if (!res.ok) throw new Error('Error al buscar álbumes');
+    const result = await res.json();
+    // Si el backend envía un mensaje cómico, guárdalo
+    if (result.funMessage) setFunMessage(result.funMessage);
+    else setFunMessage(null);
     return {
-      data: result.albums,
-      hasMore: result.hasMore,
+      data: result.albums as Album[],
+      hasMore: result.albums.length === 12,
       page: result.page
     };
   }, [currentQuery]);
-
-  // Log render state
-  console.log("[AlbumSearch] Render: currentQuery=", currentQuery, "hasSearched=", hasSearched, "enabled=", hasSearched && currentQuery.trim().length > 0);
 
   const {
     data: searchResults,
@@ -95,11 +91,9 @@ export function AlbumSearch() {
   // Debounced search on input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    console.log("[AlbumSearch] Input changed:", value);
     form.setValue("query", value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      console.log("[AlbumSearch] Debounced search triggered for:", value);
       setCurrentQuery(value);
       setHasSearched(true);
       resetSearch();
@@ -139,7 +133,7 @@ export function AlbumSearch() {
                 <FormControl>
                   <div className="relative">
                     <Input
-                      placeholder="Search for an album or artist..."
+                      placeholder="Busca un álbum o artista de rock..."
                       {...field}
                       className={clsx(
                         "text-lg p-6 pr-14 rounded-2xl border-2 border-primary/60 bg-white/90 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/30 transition-all shadow-lg",
@@ -167,17 +161,33 @@ export function AlbumSearch() {
         </form>
       </Form>
 
-      {isLoading && (
-        <div className="text-center">
-          <LoaderCircle className="mx-auto h-12 w-12 animate-spin text-primary" />
-          <p className="mt-4 text-muted-foreground">Searching for albums...</p>
+      {/* Mensaje de invitación cuando no se ha buscado nada */}
+      {!hasSearched && !form.watch("query") && (
+        <div className="text-center py-10 bg-accent/50 rounded-lg">
+          <h3 className="text-xl font-semibold">¡Empieza a buscar tu álbum o artista de rock favorito!</h3>
+          <p className="text-muted-foreground mt-2">Escribe el nombre de un álbum o artista y descubre música increíble.</p>
         </div>
       )}
 
-      {!isLoading && hasSearched && searchResults.length === 0 && (
+      {isLoading && (
+        <div className="text-center">
+          <LoaderCircle className="mx-auto h-12 w-12 animate-spin text-primary" />
+          <p className="mt-4 text-muted-foreground">Buscando álbumes...</p>
+        </div>
+      )}
+
+      {/* Mostrar mensaje cómico si el backend lo envía y no hay resultados */}
+      {!isLoading && hasSearched && funMessage && searchResults.length === 0 && (
         <div className="text-center py-10 bg-accent/50 rounded-lg">
-          <h3 className="text-xl font-semibold">No results found</h3>
-          <p className="text-muted-foreground mt-2">Try a different search term.</p>
+          <h3 className="text-xl font-semibold">{funMessage}</h3>
+        </div>
+      )}
+
+      {/* Mensaje genérico si no hay resultados y no hay mensaje cómico */}
+      {!isLoading && hasSearched && !funMessage && searchResults.length === 0 && (
+        <div className="text-center py-10 bg-accent/50 rounded-lg">
+          <h3 className="text-xl font-semibold">No se encontraron resultados</h3>
+          <p className="text-muted-foreground mt-2">Intenta con otro término de búsqueda.</p>
         </div>
       )}
 
@@ -195,7 +205,7 @@ export function AlbumSearch() {
               {isLoading && (
                 <div className="flex items-center justify-center gap-2">
                   <LoaderCircle className="h-6 w-6 animate-spin text-primary" />
-                  <span className="text-muted-foreground">Loading more albums...</span>
+                  <span className="text-muted-foreground">Cargando más álbumes...</span>
                 </div>
               )}
             </div>
@@ -225,27 +235,7 @@ export function AlbumSearch() {
       )}
 
       {/* Show trending albums when no search has been performed */}
-      {!hasSearched && !isLoadingTrending && trendingAlbums.length > 0 && (
-        <div className="mt-12">
-          <div className="flex items-center gap-2 mb-6">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            <h2 className="text-2xl font-headline font-bold">Trending Albums</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {trendingAlbums.map((album) => (
-              <AlbumCard key={album.id} album={album} variant="search" />
-            ))}
-          </div>
-          <SearchSuggestions onSearch={handleSuggestionSearch} />
-        </div>
-      )}
-
-      {!hasSearched && isLoadingTrending && (
-        <div className="text-center py-10">
-          <LoaderCircle className="mx-auto h-12 w-12 animate-spin text-primary" />
-          <p className="mt-4 text-muted-foreground">Loading trending albums...</p>
-        </div>
-      )}
+      {/* Removed trending albums section */}
     </div>
   );
 }
