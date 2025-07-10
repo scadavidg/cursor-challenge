@@ -43,7 +43,7 @@ export function AlbumCard({ album, variant = "search" }: AlbumCardProps) {
           height={400}
           className="w-full h-auto aspect-square object-cover"
           data-ai-hint="album cover"
-          onError={() => setImgSrc("/default-album.png")}
+          onError={() => setImgSrc("/default-album-image.png")}
         />
       </CardHeader>
       <CardContent className="p-4 flex-1">

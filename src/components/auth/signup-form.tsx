@@ -41,22 +41,43 @@ export function SignUpForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      // For demo purposes, we'll just redirect to login
-      // In a real app, you would create the user and then log them in
-      toast({
-        title: "Account Created!",
-        description: "Please sign in with your new account.",
+    try {
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
       });
-      setIsLoading(false);
-      // Redirect to login after a short delay
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al crear la cuenta');
+      }
+
+      toast({
+        title: "¡Cuenta creada!",
+        description: "Por favor inicia sesión con tu nueva cuenta.",
+      });
+
+      // Redirigir al login después de un breve delay
       setTimeout(() => {
         window.location.href = '/login';
       }, 1000);
-    }, 1500);
+
+    } catch (error) {
+      console.error('Error en registro:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Error al crear la cuenta",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (

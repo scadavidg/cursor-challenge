@@ -1,28 +1,34 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { getToken } from 'next-auth/jwt'
 
-export function middleware(request: NextRequest) {
-  const sessionToken = request.cookies.get('session-token')?.value;
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Obtener el token de sesión
+  const token = await getToken({ 
+    req: request, 
+    secret: process.env.NEXTAUTH_SECRET 
+  });
 
   const protectedRoutes = ['/home', '/favorites', '/explore'];
   const authRoutes = ['/login', '/signup'];
 
   // Handle root path redirect
   if (pathname === '/') {
-    if (sessionToken) {
+    if (token) {
       return NextResponse.redirect(new URL('/home', request.url));
     } else {
       return NextResponse.redirect(new URL('/login', request.url));
     }
   }
 
-  if (!sessionToken && protectedRoutes.some(path => pathname.startsWith(path))) {
+  if (!token && protectedRoutes.some(path => pathname.startsWith(path))) {
     const loginUrl = new URL('/login', request.url);
     return NextResponse.redirect(loginUrl);
   }
 
-  if (sessionToken && authRoutes.some(path => pathname.startsWith(path))) {
+  if (token && authRoutes.some(path => pathname.startsWith(path))) {
     return NextResponse.redirect(new URL('/home', request.url));
   }
 

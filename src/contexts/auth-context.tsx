@@ -2,78 +2,64 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => void;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
   isLoading: boolean;
+  user: any;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Helper to manage cookies
-const getCookie = (name: string): string | undefined => {
-  if (typeof document === 'undefined') return undefined;
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(';').shift();
-};
-
-const setCookie = (name: string, value: string, days: number) => {
-  if (typeof document === 'undefined') return;
-  let expires = "";
-  if (days) {
-    const date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    expires = "; expires=" + date.toUTCString();
-  }
-  document.cookie = name + "=" + (value || "") + expires + "; path=/";
-};
-
-const removeCookie = (name: string) => {
-  if (typeof document === 'undefined') return;
-  document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-};
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
 
   useEffect(() => {
-    const token = getCookie("session-token");
-    if (token) {
-      setIsAuthenticated(true);
-    }
-    setIsLoading(false);
-  }, []);
+    setIsLoading(status === "loading");
+  }, [status]);
 
-  const login = (email: string, password: string) => {
-    // Basic validation for test user
-    if (!email || !password) {
-      throw new Error('Email and password are required');
+  // Redirige automáticamente si la sesión está activa y estás en /login
+  useEffect(() => {
+    if (session && typeof window !== "undefined" && window.location.pathname === "/login") {
+      router.push("/home");
     }
+  }, [session, router]);
 
-    // Hardcode a temporary user for testing
-    if (email === 'test@gmail.com' && password === 'testing') {
-      setCookie("session-token", "test-token", 1); // Use a dummy token for the hardcoded user
-      setIsAuthenticated(true);
-      router.push('/home');
-    } else {
-      // In a real app, you would validate credentials with your API
-      throw new Error('Invalid credentials. Use test@gmail.com / testing');
+  const login = async (email: string, password: string) => {
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+      // No redirigir aquí
+    } catch (error) {
+      throw error;
     }
   };
 
-  const logout = () => {
-    removeCookie("session-token");
-    setIsAuthenticated(false);
+  const logout = async () => {
+    await signOut({ redirect: false });
     router.push("/login");
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ 
+      isAuthenticated: !!session, 
+      login, 
+      logout, 
+      isLoading,
+      user: session?.user 
+    }}>
       {children}
     </AuthContext.Provider>
   );
