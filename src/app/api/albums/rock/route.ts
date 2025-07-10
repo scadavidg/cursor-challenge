@@ -45,6 +45,4 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Error interno del servidor" }, { status: 500 });
   }
-}
-
-export default { GET }; 
+} 
