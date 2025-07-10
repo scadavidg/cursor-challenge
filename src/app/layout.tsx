@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SessionProvider from "@/components/SessionProvider";
 import { AuthProvider } from "@/contexts/auth-context";
 import { FavoritesProvider } from "@/contexts/favorites-context";
 import { Header } from "@/components/header";
@@ -23,17 +24,19 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Space+Grotesk:wght@500;700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased h-full">
-        <AuthProvider>
-          <FavoritesProvider>
-            <div className="flex flex-col h-full">
-              <Header />
-              <main className="flex-1 overflow-y-auto p-4 md:p-8">
-                {children}
-              </main>
-            </div>
-            <Toaster />
-          </FavoritesProvider>
-        </AuthProvider>
+        <SessionProvider>
+          <AuthProvider>
+            <FavoritesProvider>
+              <div className="flex flex-col h-full">
+                <Header />
+                <main className="flex-1 overflow-y-auto p-4 md:p-8">
+                  {children}
+                </main>
+              </div>
+              <Toaster />
+            </FavoritesProvider>
+          </AuthProvider>
+        </SessionProvider>
       </body>
     </html>
   );

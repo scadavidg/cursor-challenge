@@ -39,19 +39,19 @@ export function LoginForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     
     try {
-      login(values.email, values.password);
+      await login(values.email, values.password);
       toast({
-        title: "Login Successful",
-        description: "Welcome back!",
+        title: "Inicio de sesión exitoso",
+        description: "¡Bienvenido de vuelta!",
       });
     } catch (error: any) {
       toast({
-        title: "Login Failed",
-        description: error.message || "Invalid credentials. Use test@gmail.com / testing",
+        title: "Error de inicio de sesión",
+        description: error.message || "Credenciales inválidas",
         variant: "destructive",
       });
     } finally {
@@ -104,7 +104,7 @@ export function LoginForm() {
                 </Button>
               </p>
               <p className="text-xs text-muted-foreground">
-                Demo credentials: test@gmail.com / testing
+                Crea una cuenta para probar la aplicación
               </p>
             </div>
           </CardFooter>
