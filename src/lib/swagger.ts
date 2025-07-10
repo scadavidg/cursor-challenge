@@ -4,12 +4,12 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'TuneStack API - Autenticación',
+      title: 'RockStack API - Autenticación',
       version: '1.0.0',
-      description: 'API para autenticación y gestión de usuarios de TuneStack',
+      description: 'API para autenticación y gestión de usuarios de RockStack',
       contact: {
-        name: 'TuneStack Team',
-        email: 'support@tunestack.com',
+        name: 'RockStack Team',
+        email: 'support@RockStack.com',
       },
     },
     servers: [

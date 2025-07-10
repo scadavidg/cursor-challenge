@@ -6,7 +6,7 @@ Crea un archivo `.env.local` en la raíz del proyecto con las siguientes variabl
 
 ```env
 # Database
-DATABASE_URL="postgresql://username:password@localhost:5432/tunestack"
+DATABASE_URL="postgresql://username:password@localhost:5432/RockStack"
 
 # NextAuth
 NEXTAUTH_URL="http://localhost:9002"

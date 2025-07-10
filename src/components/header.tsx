@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 
 export function Header() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -17,12 +17,22 @@ export function Header() {
     return null;
   }
 
+  // Obtener el primer nombre del usuario
+  let firstName = "";
+  if (user?.name) {
+    firstName = user.name.split(" ")[0];
+  } else if (user?.email) {
+    firstName = user.email.split("@")[0];
+  }
+
   return (
     <header className="bg-card border-b sticky top-0 z-50">
       <div className="container mx-auto flex items-center justify-between p-4">
-        <Link href="/home" className="flex items-center gap-2" aria-label="TuneStack Home">
+        <Link href="/home" className="flex items-center gap-2" aria-label="RockStack Home">
           <Music2 className="h-8 w-8 text-primary" />
-          <span className="text-2xl font-headline font-bold">TuneStack</span>
+          <span className="text-2xl font-headline font-bold">
+            RockStack{firstName ? ` ${firstName}` : ""}
+          </span>
         </Link>
         <nav>
           <div className="flex items-center gap-2">
