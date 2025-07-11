@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Heart, Trash2 } from "lucide-react";
+import { Heart, Trash2, Eye } from "lucide-react";
 import { useState } from "react";
 
 import type { Album } from "@/lib/types";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useToast } from "@/hooks/use-toast";
+import { AlbumPreviewModal } from "./album-preview-modal";
 
 interface AlbumCardProps {
   album: Album;
@@ -19,6 +20,7 @@ export function AlbumCard({ album, variant = "search" }: AlbumCardProps) {
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const isAlbumFavorite = isFavorite(album.id);
 
   // Estado para manejar el src de la imagen
@@ -65,8 +67,19 @@ export function AlbumCard({ album, variant = "search" }: AlbumCardProps) {
     }
   };
 
+  // Handler para abrir preview (solo disponible para favoritos)
+  const handlePreview = () => {
+    if (variant === "favorite") {
+      setShowPreview(true);
+    }
+  };
+
   return (
-    <Card className="flex flex-col overflow-hidden h-full transition-transform transform hover:-translate-y-1 hover:shadow-xl">
+    <>
+      <Card 
+        className="flex flex-col overflow-hidden h-full transition-transform transform hover:-translate-y-1 hover:shadow-xl cursor-pointer"
+        onClick={variant === "favorite" ? handlePreview : undefined}
+      >
       <CardHeader className="p-0">
         <Image
           src={imgSrc}
@@ -87,7 +100,10 @@ export function AlbumCard({ album, variant = "search" }: AlbumCardProps) {
           <Button
             size="sm"
             className="w-full"
-            onClick={handleToggleFavorite}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleFavorite();
+              }}
             disabled={isLoading}
             variant={isAlbumFavorite ? "destructive" : "default"}
           >
@@ -104,18 +120,42 @@ export function AlbumCard({ album, variant = "search" }: AlbumCardProps) {
             )}
           </Button>
         ) : (
+            <div className="flex gap-2 w-full">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePreview();
+                }}
+                title="Ver detalles y escuchar canciones"
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                Preview
+              </Button>
           <Button
             variant="destructive"
             size="sm"
-            className="w-full"
-            onClick={handleRemove}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRemove();
+                }}
             disabled={isLoading}
           >
             <Trash2 className="mr-2 h-4 w-4" />
             {isLoading ? "Removiendo..." : "Remover"}
           </Button>
+            </div>
         )}
       </CardFooter>
     </Card>
+
+      <AlbumPreviewModal
+        album={showPreview ? album : null}
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+      />
+    </>
   );
 }
