@@ -28,7 +28,6 @@ export async function GET(
 
     return NextResponse.json(albumWithTracks);
   } catch (error) {
-    console.error("Error al obtener detalles del álbum:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Error interno del servidor" },
       { status: 500 }

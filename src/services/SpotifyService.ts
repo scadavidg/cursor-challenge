@@ -43,9 +43,6 @@ export class SpotifyService {
       `'${url}'`,
       '-H', `'Authorization: Bearer ${this.accessToken}'`
     ].join(' ');
-    console.log('🔍 Spotify API Request:');
-    console.log(curl);
-    console.log('---');
     const res = await fetch(url, {
       headers: { "Authorization": `Bearer ${this.accessToken}` }
     });

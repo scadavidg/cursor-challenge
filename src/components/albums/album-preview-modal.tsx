@@ -15,6 +15,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { EnhancedAudioPlayer } from "./enhanced-audio-player";
 import { useDeezerPreviews } from "@/hooks/use-deezer-previews";
 import type { Album, AlbumDetails, Track } from "@/lib/types";
+import { VisuallyHidden } from "@/components/ui/visually-hidden";
+import { SpotifyIcon } from "@/components/ui/spotify-icon";
+import { DeezerIcon } from "@/components/ui/deezer-icon";
+import { EqualizerBars } from "@/components/ui/equalizer-bars";
 
 interface AlbumPreviewModalProps {
   album: Album | null;
@@ -65,7 +69,6 @@ export function AlbumPreviewModal({ album, isOpen, onClose }: AlbumPreviewModalP
         .map((track: Track) => track.name);
 
       if (songsWithoutPreview.length > 0) {
-        console.log("🎵 Buscando previews alternativos en Deezer para:", songsWithoutPreview);
         await fetchPreviews(songsWithoutPreview);
       }
     } catch (err) {
@@ -136,6 +139,11 @@ export function AlbumPreviewModal({ album, isOpen, onClose }: AlbumPreviewModalP
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden w-[95vw]">
+        <VisuallyHidden>
+          <DialogTitle>
+            {album?.title || "Detalles del álbum"}
+          </DialogTitle>
+        </VisuallyHidden>
         <DialogHeader>
           <DialogTitle className="text-2xl font-headline">
             {album.title}
@@ -247,36 +255,65 @@ export function AlbumPreviewModal({ album, isOpen, onClose }: AlbumPreviewModalP
                     return (
                       <div
                         key={track.id}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors gap-2"
+                        className={
+                          `flex flex-row items-center p-2 rounded-lg transition-colors cursor-pointer gap-2 sm:gap-3 ` +
+                          (isSelected ? 'bg-primary/10 border-2 border-primary' : 'bg-muted/30 hover:bg-muted/50')
+                        }
+                        onClick={() => {
+                          if (isSelected) {
+                            handleTogglePlay(track.name);
+                          } else {
+                            handleSelectPreview(track);
+                          }
+                        }}
                       >
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <span className="text-sm text-muted-foreground w-8 flex-shrink-0">
-                            {track.track_number}
-                          </span>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate">{track.name}</p>
-                            {previewSource && (
-                              <p className="text-xs text-muted-foreground">
-                                Preview: {previewSource}
-                              </p>
-                            )}
-                          </div>
-                          <span className="text-sm text-muted-foreground flex-shrink-0">
-                            {formatDuration(track.duration_ms)}
+                        <span className="text-xs text-muted-foreground w-6 flex-shrink-0 text-center">
+                          {track.track_number}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <span className="block min-w-0 truncate text-sm font-medium">
+                            {track.name.length > 30 ? track.name.slice(0, 30) + '...' : track.name}
                           </span>
                         </div>
-                        <div className="sm:ml-4 flex-shrink-0 flex items-center">
+                        <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                          {previewSource && (
+                            <span className="hidden xs:inline text-xs text-muted-foreground">
+                              {previewSource}
+                            </span>
+                          )}
+                          <span className="text-xs text-muted-foreground">
+                            {formatDuration(track.duration_ms)}
+                          </span>
                           {previewUrl ? (
-                            <Button
-                              variant={isSelected ? "default" : "outline"}
-                              size="icon"
-                              onClick={() => handleSelectPreview(track)}
-                              title="Escuchar preview"
-                            >
-                              <Headphones className="h-5 w-5" />
-                            </Button>
+                            <>
+                              {getPreviewSource(track) === "Spotify" && (
+                                <a
+                                  href={track.external_urls?.spotify}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Ver en Spotify"
+                                  onClick={e => e.stopPropagation()}
+                                >
+                                  <SpotifyIcon className="w-5 h-5" />
+                                </a>
+                              )}
+                              {getPreviewSource(track) === "Deezer" && (
+                                <a
+                                  href={`https://www.deezer.com/search/${encodeURIComponent(track.name)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Ver en Deezer"
+                                  onClick={e => e.stopPropagation()}
+                                >
+                                  <DeezerIcon className="w-5 h-5" />
+                                </a>
+                              )}
+                              {isSelected && (
+                                <EqualizerBars className="w-5 h-5 text-primary" />
+                              )}
+                            </>
                           ) : (
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="outline" className="text-xs flex-shrink-0">
                               Sin preview
                             </Badge>
                           )}

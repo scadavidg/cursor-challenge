@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({ isFavorite });
   } catch (error) {
-    console.error("Error al verificar favorito:", error);
     return NextResponse.json({ isFavorite: false });
   }
 } 

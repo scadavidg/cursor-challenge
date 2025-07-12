@@ -5,8 +5,11 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8 animate-fade-in">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Music2 className="mx-auto h-12 w-auto text-primary" />
-        <h2 className="mt-6 text-center text-3xl font-bold font-headline tracking-tight text-foreground">
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <Music2 className="h-8 w-8 text-primary" />
+          <h1 className="text-2xl font-bold text-primary">RockStack</h1>
+        </div>
+        <h2 className="text-center text-3xl font-bold font-headline tracking-tight text-foreground">
           Sign in to your account
         </h2>
       </div>

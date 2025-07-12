@@ -10,7 +10,7 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<'search' | 'explore'>('explore');
 
   return (
-    <div className="container mx-auto animate-fade-in">
+    <div className="container mx-auto px-2 sm:px-4 animate-fade-in">
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-6xl font-headline font-bold mb-2">
           Descubre tu próximo álbum favorito

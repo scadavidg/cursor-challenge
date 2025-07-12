@@ -20,11 +20,22 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { LoaderCircle } from "lucide-react";
+import { PasswordInput } from "./password-input";
+import { PasswordStrengthIndicator } from "./password-strength-indicator";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "El nombre debe tener al menos 2 caracteres." }),
   email: z.string().email({ message: "Correo electrónico inválido." }),
-  password: z.string().min(6, { message: "La contraseña debe tener al menos 6 caracteres." }),
+  password: z.string()
+    .min(8, { message: "La contraseña debe tener al menos 8 caracteres." })
+    .regex(/[A-Z]/, { message: "La contraseña debe contener al menos una mayúscula." })
+    .regex(/[a-z]/, { message: "La contraseña debe contener al menos una minúscula." })
+    .regex(/\d/, { message: "La contraseña debe contener al menos un número." })
+    .regex(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, { message: "La contraseña debe contener al menos un símbolo." }),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Las contraseñas no coinciden",
+  path: ["confirmPassword"],
 });
 
 export function SignUpForm() {
@@ -38,8 +49,11 @@ export function SignUpForm() {
       name: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
+
+  const password = form.watch("password");
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -69,7 +83,6 @@ export function SignUpForm() {
       }, 1000);
 
     } catch (error) {
-      console.error('Error en registro:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Error al crear la cuenta",
@@ -118,7 +131,21 @@ export function SignUpForm() {
                 <FormItem>
                   <FormLabel>Contraseña</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <PasswordInput placeholder="••••••••" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                  {password && <PasswordStrengthIndicator password={password} />}
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirmar contraseña</FormLabel>
+                  <FormControl>
+                    <PasswordInput placeholder="••••••••" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
