@@ -16,25 +16,20 @@ export async function POST(request: NextRequest) {
     // Consultar Deezer por cada canción
     for (const songName of songNames) {
       try {
-        console.log(`🎵 Buscando preview para: ${songName}`);
         const preview = await deezerService.getTrackPreview(songName);
         
         if (preview) {
           previews.push(preview);
-          console.log(`✅ Preview encontrado para "${songName}": ${preview}`);
         } else {
           previews.push(null);
-          console.log(`❌ No se encontró preview para "${songName}"`);
         }
       } catch (error) {
-        console.error(`Error buscando preview para "${songName}":`, error);
         previews.push(null);
       }
     }
 
     return NextResponse.json({ previews });
   } catch (error) {
-    console.error("Error al obtener previews de Deezer:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Error interno del servidor" },
       { status: 500 }

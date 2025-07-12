@@ -32,7 +32,6 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
       const favorites = await FavoriteService.getFavorites();
       setFavorites(favorites);
     } catch (error) {
-      console.error("Error fetching favorites:", error);
       setFavorites([]);
     } finally {
       setIsLoading(false);
@@ -45,7 +44,6 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
     try {
       return await FavoriteService.checkFavorite(albumId);
     } catch (error) {
-      console.error("Error checking favorite status:", error);
       return false;
     }
   };
@@ -64,7 +62,6 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
       // Actualizar la lista de favoritos
       await fetchFavorites();
     } catch (error) {
-      console.error("Error adding favorite:", error);
       throw error;
     }
   };
@@ -80,7 +77,6 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
       // Actualizar la lista de favoritos
       await fetchFavorites();
     } catch (error) {
-      console.error("Error removing favorite:", error);
       throw error;
     }
   };

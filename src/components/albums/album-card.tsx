@@ -10,6 +10,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { useFavorites } from "@/hooks/use-favorites";
 import { useToast } from "@/hooks/use-toast";
 import { AlbumPreviewModal } from "./album-preview-modal";
+import { useRouter } from "next/navigation";
+import { isMobileDevice } from "@/lib/utils";
 
 interface AlbumCardProps {
   album: Album;
@@ -67,10 +69,15 @@ export function AlbumCard({ album, variant = "search" }: AlbumCardProps) {
     }
   };
 
+  const router = useRouter();
   // Handler para abrir preview (solo disponible para favoritos)
   const handlePreview = () => {
     if (variant === "favorite") {
-      setShowPreview(true);
+      if (isMobileDevice()) {
+        router.push(`/favorites/preview/${album.id}`);
+      } else {
+        setShowPreview(true);
+      }
     }
   };
 

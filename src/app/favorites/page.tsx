@@ -3,7 +3,7 @@ import { FavoritesStats } from "@/components/albums/favorites-stats";
 
 export default function FavoritesPage() {
   return (
-    <div className="container mx-auto animate-fade-in">
+    <div className="container mx-auto px-2 sm:px-4 animate-fade-in">
       <div className="mb-12">
         <h1 className="text-4xl md:text-5xl font-headline font-bold mb-2">
           Tus Favoritos

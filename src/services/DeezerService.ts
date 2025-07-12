@@ -1,6 +1,8 @@
 const DEEZER_API_URL = "https://api.deezer.com";
 
-export class DeezerService {
+import { IExternalMusicService } from "@/domain/services/IExternalMusicService";
+
+export class DeezerService implements IExternalMusicService {
   private async fetchDeezer(endpoint: string, params: Record<string, any> = {}) {
     const url = `${DEEZER_API_URL}${endpoint}?${new URLSearchParams(params).toString()}`;
     const curl = [
@@ -8,12 +10,11 @@ export class DeezerService {
       '-X', 'GET',
       `'${url}'`
     ].join(' ');
-    console.log('🎵 Deezer API Request:');
-    console.log(curl);
-    console.log('---');
     
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`Deezer API error: ${res.status}`);
+    if (!res.ok) {
+      throw new Error(`Deezer API error: ${res.status}`);
+    }
     return res.json();
   }
 
@@ -83,7 +84,7 @@ export class DeezerService {
       
       return null;
     } catch (error) {
-      console.error(`Error buscando preview para "${songName}":`, error);
+      console.error(`[DeezerService] Error al obtener preview para '${songName}':`, error);
       return null;
     }
   }
