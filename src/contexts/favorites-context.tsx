@@ -30,8 +30,10 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
     try {
       setIsLoading(true);
       const favorites = await FavoriteService.getFavorites();
+      console.log('[FavoritesContext] Favoritos obtenidos:', favorites);
       setFavorites(favorites);
     } catch (error) {
+      console.error('[FavoritesContext] Error al obtener favoritos:', error);
       setFavorites([]);
     } finally {
       setIsLoading(false);
@@ -59,9 +61,11 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       await FavoriteService.addFavorite(album);
+      console.log('[FavoritesContext] Álbum agregado a favoritos:', album);
       // Actualizar la lista de favoritos
       await fetchFavorites();
     } catch (error) {
+      console.error('[FavoritesContext] Error al agregar favorito:', error);
       throw error;
     }
   };
@@ -74,9 +78,11 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       await FavoriteService.removeFavorite(albumId);
+      console.log('[FavoritesContext] Álbum removido de favoritos:', albumId);
       // Actualizar la lista de favoritos
       await fetchFavorites();
     } catch (error) {
+      console.error('[FavoritesContext] Error al remover favorito:', error);
       throw error;
     }
   };

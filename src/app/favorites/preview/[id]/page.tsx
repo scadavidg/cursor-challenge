@@ -70,11 +70,13 @@ export default function AlbumPreviewPage({ params }: { params: Promise<{ id: str
     if (track.preview_url) return track.preview_url;
     return previews[track.name] || null;
   };
+
   const getPreviewSource = (track: any) => {
     if (track.preview_url) return "Spotify";
     if (previews[track.name]) return "Deezer";
     return null;
   };
+
   const handleSelectPreview = (track: any) => {
     const previewUrl = getPreviewUrl(track);
     const previewSource = getPreviewSource(track);
