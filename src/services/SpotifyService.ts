@@ -4,7 +4,9 @@ import { Buffer } from "node:buffer";
 const SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token";
 const SPOTIFY_API_URL = "https://api.spotify.com/v1";
 
-export class SpotifyService {
+import { IExternalMusicService } from "@/domain/services/IExternalMusicService";
+
+export class SpotifyService implements IExternalMusicService {
   private clientId: string;
   private clientSecret: string;
   private accessToken: string | null = null;
@@ -93,5 +95,10 @@ export class SpotifyService {
       limit: 50 // Obtener todas las canciones del álbum
     });
     return data;
+  }
+
+  // Spotify no proporciona previews directos, este método retorna null
+  async getTrackPreview(songName: string): Promise<string | null> {
+    return null;
   }
 } 
