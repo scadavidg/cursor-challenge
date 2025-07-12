@@ -4,7 +4,9 @@ import { Buffer } from "node:buffer";
 const SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token";
 const SPOTIFY_API_URL = "https://api.spotify.com/v1";
 
-export class SpotifyService {
+import { IExternalMusicService } from "@/domain/services/IExternalMusicService";
+
+export class SpotifyService implements IExternalMusicService {
   private clientId: string;
   private clientSecret: string;
   private accessToken: string | null = null;
@@ -77,5 +79,26 @@ export class SpotifyService {
       offset
     });
     return data.albums;
+  }
+
+  // Obtener información detallada de un álbum incluyendo sus canciones
+  async getAlbumDetails(albumId: string) {
+    await this.authenticate();
+    const data = await this.fetchSpotify(`/albums/${albumId}`);
+    return data;
+  }
+
+  // Obtener las canciones de un álbum con información de preview
+  async getAlbumTracks(albumId: string) {
+    await this.authenticate();
+    const data = await this.fetchSpotify(`/albums/${albumId}/tracks`, {
+      limit: 50 // Obtener todas las canciones del álbum
+    });
+    return data;
+  }
+
+  // Spotify no proporciona previews directos, este método retorna null
+  async getTrackPreview(songName: string): Promise<string | null> {
+    return null;
   }
 } 

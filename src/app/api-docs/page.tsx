@@ -13,7 +13,7 @@ export default function ApiDocs() {
     fetch("/api/docs")
       .then((response) => response.json())
       .then((data) => setSpec(data))
-      .catch((error) => console.error("Error loading API docs:", error));
+      .catch((error) => {});
   }, []);
 
   if (!spec) {

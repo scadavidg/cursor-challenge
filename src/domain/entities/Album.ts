@@ -14,4 +14,13 @@ export class Album {
       item.images?.[0]?.url || ""
     );
   }
+
+  static fromDeezer(item: any): Album {
+    return new Album(
+      item.id.toString(),
+      item.title,
+      item.artist?.name || "",
+      item.cover_medium || item.cover || ""
+    );
+  }
 } 

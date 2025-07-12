@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { AlbumUseCases } from "@/domain/usecases/AlbumUseCases";
+import { container } from "@/infrastructure/di/container";
 import { RockKeywordService } from '@/services/RockKeywordService';
 
 const ROCK_MESSAGES = [
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       const funMessage = ROCK_MESSAGES[Math.floor(Math.random() * ROCK_MESSAGES.length)];
       return NextResponse.json({ albums: [], page, limit, funMessage });
     }
-    const albumUseCases = new AlbumUseCases();
+    const albumUseCases = container.getAlbumUseCases();
     const albums = await albumUseCases.searchRockAlbums(query, page, limit);
     return NextResponse.json({ albums, page, limit });
   } catch (error) {
