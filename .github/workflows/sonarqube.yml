@@ -30,19 +30,22 @@ jobs:
       run: |
         npm run test:coverage || echo "No test coverage available"
 
-    - name: Run SonarQube Scanner
+    - name: Setup SonarQube Scanner
       uses: sonarqube-quality-gate-action@master
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       with:
         scannerHomePath: /opt/sonar-scanner
-        args: >
-          -Dsonar.projectKey=cursor-challenge
-          -Dsonar.sources=src
-          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-          -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-          -Dsonar.coverage.exclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx,**/__tests__/**,**/test/**,**/tests/**,**/*.d.ts
-          -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/.next/**,**/coverage/**,**/*.config.js,**/*.config.ts,**/public/**,**/prisma/migrations/**,**/docs/**
+
+    - name: Run SonarQube Scanner
+      run: |
+        /opt/sonar-scanner/bin/sonar-scanner \
+          -Dsonar.projectKey=cursor-challenge \
+          -Dsonar.sources=src \
+          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+          -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+          -Dsonar.coverage.exclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx,**/__tests__/**,**/test/**,**/tests/**,**/*.d.ts \
+          -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/.next/**,**/coverage/**,**/*.config.js,**/*.config.ts,**/public/**,**/prisma/migrations/**,**/docs/** \
           -Dsonar.qualitygate.wait=true 
