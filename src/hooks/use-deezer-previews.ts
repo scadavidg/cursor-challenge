@@ -59,7 +59,6 @@ export function useDeezerPreviews(): UseDeezerPreviewsReturn {
       }
 
       const data = await response.json();
-      console.log('[useDeezerPreviews] Previews recibidos:', data);
       
       // Crear un objeto con los nombres de canciones como claves
       const previewsMap: Record<string, string | null> = {};

@@ -13,10 +13,8 @@ export class DeezerService implements IExternalMusicService {
     
     const res = await fetch(url);
     if (!res.ok) {
-      console.error(`[DeezerService] Error en fetchDeezer: ${res.status} - ${url}`);
       throw new Error(`Deezer API error: ${res.status}`);
     }
-    console.log(`[DeezerService] Respuesta de Deezer para ${endpoint}:`, res.status);
     return res.json();
   }
 
@@ -71,7 +69,6 @@ export class DeezerService implements IExternalMusicService {
   async getTrackPreview(songName: string): Promise<string | null> {
     try {
       const searchResult = await this.searchTracks(songName, 1, 5);
-      console.log(`[DeezerService] Resultado de búsqueda para '${songName}':`, searchResult);
       
       if (searchResult.data && searchResult.data.length > 0) {
         // Buscar la canción más similar
