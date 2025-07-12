@@ -12,9 +12,9 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 async function testDbConnection() {
   try {
     await prisma.$connect();
-    // console.log('[DB] Conexión a la base de datos exitosa');
+    console.log('[DB] Conexión a la base de datos exitosa');
   } catch (error) {
-    // console.error('[DB] Error de conexión a la base de datos:', error);
+    console.error('[DB] Error de conexión a la base de datos:', error);
   }
 }
 

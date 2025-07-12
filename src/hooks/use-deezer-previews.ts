@@ -29,10 +29,12 @@ export function useDeezerPreviews(): UseDeezerPreviewsReturn {
       });
 
       if (!response.ok) {
+        console.error('[useDeezerPreviews] Error al obtener previews de Deezer:', response.status);
         throw new Error("Error al obtener previews de Deezer");
       }
 
       const data = await response.json();
+      console.log('[useDeezerPreviews] Previews recibidos:', data);
       
       // Crear un objeto con los nombres de canciones como claves
       const previewsMap: Record<string, string | null> = {};
@@ -42,8 +44,8 @@ export function useDeezerPreviews(): UseDeezerPreviewsReturn {
 
       setPreviews(prev => ({ ...prev, ...previewsMap }));
     } catch (err) {
+      console.error('[useDeezerPreviews] Error en fetchPreviews:', err);
       setError(err instanceof Error ? err.message : "Error desconocido");
-      console.error("Error fetching Deezer previews:", err);
     } finally {
       setIsLoading(false);
     }

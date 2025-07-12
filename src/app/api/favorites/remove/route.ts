@@ -26,7 +26,6 @@ export async function DELETE(request: NextRequest) {
       albumId 
     });
   } catch (error) {
-    console.error("Error al remover favorito:", error);
     
     if (error instanceof Error && error.message.includes("no estaba en tus favoritos")) {
       return NextResponse.json({ error: error.message }, { status: 404 });

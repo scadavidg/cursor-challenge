@@ -27,7 +27,6 @@ export async function POST(request: NextRequest) {
       album 
     });
   } catch (error) {
-    console.error("Error al agregar favorito:", error);
     
     if (error instanceof Error && error.message.includes("ya está en tus favoritos")) {
       return NextResponse.json({ error: error.message }, { status: 409 });
