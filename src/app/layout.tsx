@@ -3,6 +3,7 @@ import SessionProvider from "@/components/SessionProvider";
 import { AuthProvider } from "@/contexts/auth-context";
 import { Header } from "@/components/header";
 import { Toaster } from "@/components/ui/toaster";
+import { CacheInvalidationProvider, CacheDebugPanel } from "@/components";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -25,13 +26,16 @@ export default function RootLayout({
       <body className="font-body antialiased h-full">
         <SessionProvider>
           <AuthProvider>
-            <div className="flex flex-col h-full">
-              <Header />
-              <main className="flex-1 overflow-y-auto p-4 md:p-8">
-                {children}
-              </main>
-            </div>
-            <Toaster />
+            <CacheInvalidationProvider>
+              <div className="flex flex-col h-full">
+                <Header />
+                <main className="flex-1 overflow-y-auto p-4 md:p-8">
+                  {children}
+                </main>
+              </div>
+              <Toaster />
+              <CacheDebugPanel />
+            </CacheInvalidationProvider>
           </AuthProvider>
         </SessionProvider>
       </body>

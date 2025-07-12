@@ -272,7 +272,7 @@ export function AlbumPreviewModal({ album, isOpen, onClose }: AlbumPreviewModalP
                         </span>
                         <div className="flex-1 min-w-0">
                           <span className="block min-w-0 truncate text-sm font-medium">
-                            {track.name.length > 30 ? track.name.slice(0, 30) + '...' : track.name}
+                            {track.name}
                           </span>
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0 ml-2">

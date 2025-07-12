@@ -7,12 +7,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import type { AlbumDetails } from "@/lib/types";
 import { useDeezerPreviews } from "@/hooks/use-deezer-previews";
+import { useAlbumCache } from "@/hooks/use-album-cache";
 
 export default function AlbumPreviewPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  const [albumDetails, setAlbumDetails] = React.useState<AlbumDetails | null>(null);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
   const [currentlyPlaying, setCurrentlyPlaying] = React.useState<string | null>(null);
   const [selectedPreview, setSelectedPreview] = React.useState<{
     url: string;
@@ -20,37 +18,53 @@ export default function AlbumPreviewPage({ params }: { params: Promise<{ id: str
     source: string;
   } | null>(null);
 
+  // Hook para caché de álbumes
+  const { 
+    albumDetails, 
+    loading, 
+    error, 
+    fetchAlbumDetails, 
+    invalidateCache, 
+    isFromCache: albumFromCache 
+  } = useAlbumCache();
+
   // Hook para previews alternativos (Deezer)
-  const { previews, isLoading: deezerLoading, fetchPreviews } = useDeezerPreviews();
+  const { 
+    previews, 
+    isLoading: deezerLoading, 
+    fetchPreviews, 
+    isFromCache: deezerFromCache 
+  } = useDeezerPreviews();
 
   const { id } = React.use(params);
 
-  const fetchAlbumDetails = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/albums/${id}`);
-      if (!res.ok) throw new Error("No se pudo cargar el álbum");
-      const data = await res.json();
-      setAlbumDetails(data);
-      // Buscar previews alternativos en Deezer si es necesario
-      const songsWithoutPreview = data.tracks.items
+  const handleFetchAlbumDetails = async () => {
+    const details = await fetchAlbumDetails(id);
+    
+    // Buscar previews alternativos en Deezer si es necesario
+    // Usar el resultado de fetchAlbumDetails en lugar del estado
+    if (details) {
+      const songsWithoutPreview = details.tracks.items
         .filter((track: any) => !track.preview_url)
         .map((track: any) => track.name);
       if (songsWithoutPreview.length > 0) {
         await fetchPreviews(songsWithoutPreview);
       }
-    } catch (err) {
-      setError("No se pudo cargar el álbum");
-    } finally {
-      setLoading(false);
     }
   };
 
   React.useEffect(() => {
-    fetchAlbumDetails();
+    handleFetchAlbumDetails();
     // eslint-disable-next-line
   }, [id]);
+
+  // Limpiar estado de reproducción cuando se desmonta el componente
+  React.useEffect(() => {
+    return () => {
+      setCurrentlyPlaying(null);
+      setSelectedPreview(null);
+    };
+  }, []);
 
   const getPreviewUrl = (track: any) => {
     if (track.preview_url) return track.preview_url;
@@ -65,15 +79,30 @@ export default function AlbumPreviewPage({ params }: { params: Promise<{ id: str
     const previewUrl = getPreviewUrl(track);
     const previewSource = getPreviewSource(track);
     if (previewUrl) {
+      // Si hay una canción reproduciéndose, detenerla primero
+      if (currentlyPlaying && currentlyPlaying !== track.name) {
+        setCurrentlyPlaying(null);
+      }
+      
       setSelectedPreview({ url: previewUrl, trackName: track.name, source: previewSource || "" });
+      // Iniciar reproducción de la nueva canción
       setCurrentlyPlaying(track.name);
     }
   };
+  
   const handleTogglePlay = (trackName: string) => {
     if (currentlyPlaying === trackName) {
+      // Pausar la canción actual
       setCurrentlyPlaying(null);
     } else {
-      setCurrentlyPlaying(trackName);
+      // Si hay otra canción reproduciéndose, detenerla y reproducir la nueva
+      if (currentlyPlaying && currentlyPlaying !== trackName) {
+        setCurrentlyPlaying(null);
+        // Pequeño delay para asegurar que se detenga antes de iniciar la nueva
+        setTimeout(() => setCurrentlyPlaying(trackName), 50);
+      } else {
+        setCurrentlyPlaying(trackName);
+      }
     }
   };
 
@@ -95,9 +124,11 @@ export default function AlbumPreviewPage({ params }: { params: Promise<{ id: str
           currentlyPlaying={currentlyPlaying}
           onSelectPreview={handleSelectPreview}
           onTogglePlay={handleTogglePlay}
-          fetchAlbumDetails={fetchAlbumDetails}
+          fetchAlbumDetails={() => handleFetchAlbumDetails()}
           getPreviewUrl={getPreviewUrl}
           getPreviewSource={getPreviewSource}
+          albumFromCache={albumFromCache}
+          deezerFromCache={deezerFromCache}
         />
       </div>
     </div>

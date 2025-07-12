@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { FavoriteUseCases } from "@/domain/usecases/FavoriteUseCases";
+import { container } from "@/infrastructure/di/container";
 import type { Album } from "@/lib/types";
 
 export async function POST(request: NextRequest) {
@@ -19,14 +19,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Datos de álbum inválidos" }, { status: 400 });
     }
 
-    const favoriteUseCases = new FavoriteUseCases();
-    await favoriteUseCases.addToFavorites(session.user.id, album);
+    const favoriteUseCases = container.createFavoriteUseCases(session.user.id);
+    await favoriteUseCases.addFavorite(album);
     
     return NextResponse.json({ 
       message: "Álbum agregado a favoritos",
       album 
     });
   } catch (error) {
+    console.error('[Add Favorite API] Error:', error);
     
     if (error instanceof Error && error.message.includes("ya está en tus favoritos")) {
       return NextResponse.json({ error: error.message }, { status: 409 });

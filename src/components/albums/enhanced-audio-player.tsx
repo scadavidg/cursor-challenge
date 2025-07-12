@@ -35,16 +35,21 @@ export function EnhancedAudioPlayer({
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
+    
     if (previewUrl && previewUrl !== prevUrlRef.current) {
+      // Cargar nueva URL
+      audio.src = previewUrl;
       audio.currentTime = 0;
-      if (isPlaying) {
-        audio.play().catch(() => {});
-      } else {
-        audio.pause();
-      }
       prevUrlRef.current = previewUrl;
+      
+      // Reproducir si isPlaying es true
+      if (isPlaying) {
+        audio.play().catch((error) => {
+          console.error('Error al reproducir audio:', error);
+        });
+      }
     }
-  }, [previewUrl]);
+  }, [previewUrl, isPlaying]);
 
   // Controlar play/pause desde isPlaying
   useEffect(() => {
@@ -68,7 +73,10 @@ export function EnhancedAudioPlayer({
     if (!audio) return;
     const updateTime = () => setCurrentTime(audio.currentTime);
     const updateDuration = () => setDuration(audio.duration);
-    const handleEnded = () => setCurrentTime(0);
+    const handleEnded = () => {
+      setCurrentTime(0);
+      // No cambiar isPlaying aquí, dejar que el componente padre maneje el estado
+    };
     audio.addEventListener('timeupdate', updateTime);
     audio.addEventListener('loadedmetadata', updateDuration);
     audio.addEventListener('ended', handleEnded);

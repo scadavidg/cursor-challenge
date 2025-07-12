@@ -8,6 +8,7 @@ import type { AlbumDetails, Track } from "@/lib/types";
 import { SpotifyIcon } from "@/components/ui/spotify-icon";
 import { DeezerIcon } from "@/components/ui/deezer-icon";
 import { EqualizerBars } from "@/components/ui/equalizer-bars";
+import { CacheIndicator } from "@/components/cache-indicator";
 
 interface AlbumPreviewContentProps {
   albumDetails: AlbumDetails | null;
@@ -21,6 +22,8 @@ interface AlbumPreviewContentProps {
   fetchAlbumDetails: () => void;
   getPreviewUrl: (track: Track) => string | null;
   getPreviewSource: (track: Track) => string | null;
+  albumFromCache?: boolean;
+  deezerFromCache?: boolean;
 }
 
 export function AlbumPreviewContent({
@@ -35,6 +38,8 @@ export function AlbumPreviewContent({
   fetchAlbumDetails,
   getPreviewUrl,
   getPreviewSource,
+  albumFromCache = false,
+  deezerFromCache = false,
 }: AlbumPreviewContentProps) {
   const formatDuration = (durationMs: number) => {
     const minutes = Math.floor(durationMs / 60000);
@@ -108,6 +113,8 @@ export function AlbumPreviewContent({
               <Disc3 className="h-3 w-3" />
               {albumDetails.total_tracks} canciones
             </Badge>
+            <CacheIndicator isFromCache={albumFromCache} cacheType="memory" />
+            <CacheIndicator isFromCache={deezerFromCache} cacheType="storage" />
             {deezerLoading && (
               <Badge variant="outline" className="flex items-center gap-1">
                 <Headphones className="h-3 w-3" />
@@ -157,12 +164,14 @@ export function AlbumPreviewContent({
               const previewUrl = getPreviewUrl(track);
               const previewSource = getPreviewSource(track);
               const isSelected = selectedPreview && selectedPreview.trackName === track.name;
+              const isCurrentlyPlaying = currentlyPlaying === track.name;
               return (
                 <div
                   key={track.id}
                   className={
                     `flex flex-row items-center p-2 rounded-lg transition-colors cursor-pointer ` +
-                    (isSelected ? 'bg-primary/10 border-2 border-primary' : 'bg-muted/30 hover:bg-muted/50')
+                    (isSelected ? 'bg-primary/10 border-2 border-primary' : 'bg-muted/30 hover:bg-muted/50') +
+                    (isCurrentlyPlaying ? ' ring-2 ring-primary/50' : '')
                   }
                   onClick={() => {
                     if (isSelected) {
@@ -213,8 +222,13 @@ export function AlbumPreviewContent({
                             <DeezerIcon className="w-5 h-5" />
                           </a>
                         )}
-                        {isSelected && (
-                          <EqualizerBars className="w-5 h-5 text-primary" />
+                        {isCurrentlyPlaying && (
+                          <EqualizerBars className="w-5 h-5 text-primary animate-pulse" />
+                        )}
+                        {isSelected && !isCurrentlyPlaying && (
+                          <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
+                            <div className="w-2 h-2 rounded-full bg-primary"></div>
+                          </div>
                         )}
                       </>
                     ) : (
