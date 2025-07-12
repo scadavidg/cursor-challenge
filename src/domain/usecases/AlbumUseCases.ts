@@ -1,7 +1,11 @@
-import { IAlbumRepository } from "@/domain/repositories/IAlbumRepository";
+import { SpotifyAlbumRepository } from "@/infrastructure/repositories/SpotifyAlbumRepository";
 
 export class AlbumUseCases {
-  constructor(private albumRepository: IAlbumRepository) {}
+  private albumRepository: SpotifyAlbumRepository;
+
+  constructor() {
+    this.albumRepository = new SpotifyAlbumRepository();
+  }
 
   async getRockAlbums(page: number = 1, limit: number = 12) {
     return this.albumRepository.getRockAlbums(page, limit);

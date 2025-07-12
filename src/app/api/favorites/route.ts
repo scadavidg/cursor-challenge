@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { container } from "@/infrastructure/di/container";
+import { FavoriteUseCases } from "@/domain/usecases/FavoriteUseCases";
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,12 +11,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const favoriteUseCases = container.createFavoriteUseCases(session.user.id);
-    const favorites = await favoriteUseCases.getFavorites();
+    const favoriteUseCases = new FavoriteUseCases();
+    const favorites = await favoriteUseCases.getUserFavorites(session.user.id);
     
     return NextResponse.json({ favorites });
   } catch (error) {
-    console.error('[Favorites API] Error:', error);
+    console.error("Error al obtener favoritos:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Error interno del servidor" },
       { status: 500 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { container } from "@/infrastructure/di/container";
+import { FavoriteUseCases } from "@/domain/usecases/FavoriteUseCases";
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,12 +18,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "ID de álbum requerido" }, { status: 400 });
     }
 
-    const favoriteUseCases = container.createFavoriteUseCases(session.user.id);
-    const isFavorite = await favoriteUseCases.checkFavorite(albumId);
+    const favoriteUseCases = new FavoriteUseCases();
+    const isFavorite = await favoriteUseCases.isFavorite(session.user.id, albumId);
     
     return NextResponse.json({ isFavorite });
   } catch (error) {
-    console.error('[Check Favorite API] Error:', error);
+    console.error("Error al verificar favorito:", error);
     return NextResponse.json({ isFavorite: false });
   }
 } 
