@@ -37,7 +37,7 @@ export default function ApiDocs() {
     <div className="container mx-auto p-4">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          RockStack API Documentation
+          Documentación de la API de RockStack
         </h1>
         <p className="text-gray-600">
           Documentación completa de los endpoints de autenticación y gestión de usuarios.

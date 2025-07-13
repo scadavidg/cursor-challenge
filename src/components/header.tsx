@@ -42,7 +42,7 @@ export function Header() {
             className="text-xs sm:text-sm px-2 sm:px-4"
             onClick={() => router.push('/home')}
           >
-            Home
+            Inicio
           </Button>
           <Button 
             variant="ghost" 
@@ -59,7 +59,7 @@ export function Header() {
             onClick={logout}
           >
             <LogOut className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">Sign out</span>
+            <span className="hidden sm:inline">Cerrar sesión</span>
           </Button>
         </nav>
       </div>

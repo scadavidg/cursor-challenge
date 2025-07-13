@@ -117,7 +117,7 @@ export default function AlbumPreviewPage({ params }: { params: Promise<{ id: str
         <Button variant="ghost" size="icon" onClick={() => router.push('/favorites')} aria-label="Volver">
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <span className="font-bold text-lg">Preview</span>
+        <span className="font-bold text-lg">Vista previa</span>
       </div>
       <div className="flex-1 overflow-y-auto">
         <AlbumPreviewContent
