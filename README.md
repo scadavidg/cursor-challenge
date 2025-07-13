@@ -86,26 +86,6 @@ Aplicación fullstack con Clean Architecture, integración con Spotify, Deezer y
 - Swagger para documentación de endpoints
 - Soporte para `.env.local` en desarrollo y producción
 
----
+## 📝 Licencia
 
-## 🧭 Flujo de Datos Destacado
-
-```mermaid
-graph TD
-  UI -->|click| HookFavorites
-  HookFavorites -->|add/remove| FavoriteService
-  FavoriteService -->|POST/GET| API Favorites
-  API -->|validate user| UseCases
-  UseCases --> FavoriteRepository
-  FavoriteRepository --> DB[PostgreSQL]
-```
-
-
-## ✅ Checklist de Calidad
-
-- [x] Clean Architecture implementada
-- [x] Sistema de caché funcional
-- [x] Autenticación segura con NextAuth
-- [x] UI optimizada y accesible
-- [x] Pruebas automatizadas listas
-- [x] Integración con SonarQube completada
+Este proyecto está licenciado bajo la Licencia MIT.
