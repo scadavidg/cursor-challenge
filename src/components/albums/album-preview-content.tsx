@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EnhancedAudioPlayer } from "./enhanced-audio-player";
+import { AlbumDetailsSkeleton } from "@/components/ui/skeleton";
 import type { AlbumDetails, Track } from "@/lib/types";
 import { SpotifyIcon } from "@/components/ui/spotify-icon";
 import { DeezerIcon } from "@/components/ui/deezer-icon";
@@ -61,12 +62,7 @@ export function AlbumPreviewContent({
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2 text-muted-foreground">Cargando detalles del álbum...</span>
-      </div>
-    );
+    return <AlbumDetailsSkeleton />;
   }
 
   if (error) {

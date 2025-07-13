@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Input } from "@/components/ui/input";
 import { AlbumCard } from "./album-card";
 import { SearchSuggestions } from "./search-suggestions";
+import { AlbumGridSkeleton } from "@/components/ui/skeleton";
 import type { Album } from "@/lib/types";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 
@@ -48,17 +49,24 @@ export function AlbumSearch() {
     if (!currentQuery.trim()) {
       return { data: [], hasMore: false, page };
     }
-    const res = await fetch(`/api/albums/search?query=${encodeURIComponent(currentQuery)}&page=${page}&limit=12`);
-    if (!res.ok) throw new Error('Error al buscar álbumes');
-    const result = await res.json();
-    // Si el backend envía un mensaje cómico, guárdalo
-    if (result.funMessage) setFunMessage(result.funMessage);
-    else setFunMessage(null);
-    return {
-      data: result.albums as Album[],
-      hasMore: result.hasMore, // Usar el valor real del backend
-      page: result.page
-    };
+    try {
+      const res = await fetch(`/api/albums/search?query=${encodeURIComponent(currentQuery)}&page=${page}&limit=12`);
+      if (!res.ok) throw new Error('Error al buscar álbumes');
+      const result = await res.json();
+      // Compatibilidad con ambas formas de respuesta
+      const albums = result.albums || (result.data && result.data.albums) || [];
+      const hasMore = result.hasMore ?? (result.data && result.data.hasMore) ?? false;
+      const pageNum = result.page ?? (result.data && result.data.page) ?? page;
+      if (result.funMessage) setFunMessage(result.funMessage);
+      else setFunMessage(null);
+      return {
+        data: albums as Album[],
+        hasMore,
+        page: pageNum
+      };
+    } catch (error) {
+      return { data: [], hasMore: false, page };
+    }
   }, [currentQuery]);
 
   const {
@@ -169,10 +177,9 @@ export function AlbumSearch() {
         </div>
       )}
 
-      {isLoading && (
-        <div className="text-center">
-          <LoaderCircle className="mx-auto h-12 w-12 animate-spin text-primary" />
-          <p className="mt-4 text-muted-foreground">Buscando álbumes...</p>
+      {isLoading && searchResults.length === 0 && (
+        <div className="space-y-6">
+          <AlbumGridSkeleton count={12} />
         </div>
       )}
 

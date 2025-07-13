@@ -6,6 +6,7 @@ import { AlbumCard } from "./album-card";
 import { Button } from "@/components/ui/button";
 import { FavoritesSearch } from "./favorites-search";
 import { FavoritesSort } from "./favorites-sort";
+import { AlbumGridSkeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { Music, Heart, Search } from "lucide-react";
 import type { Album } from "@/lib/types";
@@ -28,9 +29,12 @@ export function FavoritesList() {
 
   if (isLoading) {
     return (
-      <div className="text-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-        <p className="mt-4 text-muted-foreground">Cargando tus favoritos...</p>
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 mb-6">
+          <Music className="h-5 w-5 text-primary" />
+          <h2 className="text-2xl font-headline font-bold">Mis Favoritos</h2>
+        </div>
+        <AlbumGridSkeleton count={8} />
       </div>
     );
   }

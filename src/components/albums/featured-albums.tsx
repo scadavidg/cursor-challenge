@@ -4,6 +4,7 @@ import { useCallback, useEffect } from "react";
 import { LoaderCircle, Music } from "lucide-react";
 
 import { AlbumCard } from "./album-card";
+import { AlbumGridSkeleton } from "@/components/ui/skeleton";
 import type { Album } from "@/lib/types";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { removeDuplicateAlbums, createAlbumLoadFunction } from "@/lib/album-utils";
@@ -39,6 +40,22 @@ export function FeaturedAlbums({
 
   // Filtrar álbumes duplicados por id
   const uniqueAlbums = removeDuplicateAlbums(albums);
+
+  // Mostrar skeleton durante la carga inicial
+  if (isLoading && albums.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 mb-6">
+          <Music className="h-5 w-5 text-primary" />
+          <h2 className="text-2xl font-headline font-bold">{title}</h2>
+        </div>
+        {description && (
+          <p className="text-muted-foreground mb-6">{description}</p>
+        )}
+        <AlbumGridSkeleton count={12} />
+      </div>
+    );
+  }
 
   if (error) {
     return (
