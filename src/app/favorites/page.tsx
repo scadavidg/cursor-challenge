@@ -17,7 +17,7 @@ export default function FavoritesPage() {
         </p>
       </div>
       <div className="mb-8">
-        <FavoritesStats favorites={currentFavorites} />
+        <FavoritesStats />
       </div>
       <FavoritesList onFavoritesChange={setCurrentFavorites} />
     </div>

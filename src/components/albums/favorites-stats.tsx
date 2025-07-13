@@ -1,13 +1,40 @@
 "use client";
 
 import { Heart, Music } from "lucide-react";
-import { useFavorites } from "@/contexts/favorites-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatsSkeleton } from "@/components/ui/skeleton";
-import type { Album } from "@/lib/types";
+import { useEffect, useState } from "react";
 
-export function FavoritesStats({ favorites = [], isLoading }: { favorites?: Album[], isLoading?: boolean }) {
-  const safeFavorites = Array.isArray(favorites) ? favorites : [];
+interface Stats {
+  totalFavorites: number;
+  uniqueArtists: number;
+}
+
+export function FavoritesStats() {
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetch("/api/favorites/stats")
+      .then(async (res) => {
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || "Error al obtener estadísticas");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setStats(data);
+        setError(null);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setStats(null);
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
 
   if (isLoading) {
     return (
@@ -23,8 +50,11 @@ export function FavoritesStats({ favorites = [], isLoading }: { favorites?: Albu
     );
   }
 
-  const totalFavorites = safeFavorites.length;
-  const uniqueArtists = new Set(safeFavorites.map(album => album.artist)).size;
+  if (error) {
+    return (
+      <div className="text-sm text-red-500">{error}</div>
+    );
+  }
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
@@ -34,7 +64,7 @@ export function FavoritesStats({ favorites = [], isLoading }: { favorites?: Albu
           <Heart className="h-4 w-4 text-red-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{totalFavorites}</div>
+          <div className="text-2xl font-bold">{stats?.totalFavorites ?? 0}</div>
           <p className="text-xs text-muted-foreground">
             álbumes guardados
           </p>
@@ -47,7 +77,7 @@ export function FavoritesStats({ favorites = [], isLoading }: { favorites?: Albu
           <Music className="h-4 w-4 text-blue-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{uniqueArtists}</div>
+          <div className="text-2xl font-bold">{stats?.uniqueArtists ?? 0}</div>
           <p className="text-xs text-muted-foreground">
             artistas diferentes
           </p>

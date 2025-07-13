@@ -22,6 +22,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Music } from "lucide-react";
 import { PasswordInput } from "./password-input";
 import { AuthFormSkeleton } from "@/components/ui/skeleton";
+import { GoogleLoginButton } from "./google-login-button";
+import { Separator } from "@/components/ui/separator";
 
 const formSchema = z.object({
   email: z.string().min(1, { message: "El correo es obligatorio." }).email({ message: "Correo electrónico inválido." }),
@@ -109,6 +111,20 @@ export function LoginForm() {
               {isLoading && <Music className="mr-2 h-4 w-4 animate-spin" />}
               Iniciar sesión
             </Button>
+            
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <Separator className="w-full" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  O continúa con
+                </span>
+              </div>
+            </div>
+            
+            <GoogleLoginButton className="w-full" />
+            
             <div className="text-center space-y-2">
               <p className="text-sm text-muted-foreground">
                 ¿No tienes una cuenta?{" "}

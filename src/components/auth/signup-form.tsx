@@ -22,6 +22,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Music } from "lucide-react";
 import { PasswordInput } from "./password-input";
 import { PasswordStrengthIndicator } from "./password-strength-indicator";
+import { GoogleLoginButton } from "./google-login-button";
+import { Separator } from "@/components/ui/separator";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "El nombre debe tener al menos 2 caracteres." }),
@@ -163,6 +165,20 @@ export function SignUpForm() {
               {isLoading && <Music className="mr-2 h-4 w-4 animate-spin" />}
               Crear cuenta
             </Button>
+            
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <Separator className="w-full" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  O regístrate con
+                </span>
+              </div>
+            </div>
+            
+            <GoogleLoginButton className="w-full" />
+            
             <p className="text-sm text-muted-foreground">
               ¿Ya tienes una cuenta?{" "}
               <Button variant="link" asChild className="p-0 h-auto">
