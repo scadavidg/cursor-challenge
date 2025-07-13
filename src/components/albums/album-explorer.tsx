@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { LoaderCircle, Music } from "lucide-react";
+import { Music } from "lucide-react";
 
 import { AlbumCard } from "./album-card";
 import { Button } from "@/components/ui/button";
@@ -104,7 +104,7 @@ export function AlbumExplorer({
         <div ref={loadingRef} className="text-center py-8">
           {isLoading && (
             <div className="flex items-center justify-center gap-2">
-              <LoaderCircle className="h-6 w-6 animate-spin text-primary" />
+              <Music className="h-6 w-6 animate-spin text-primary" />
               <span className="text-muted-foreground">Cargando más álbumes...</span>
             </div>
           )}

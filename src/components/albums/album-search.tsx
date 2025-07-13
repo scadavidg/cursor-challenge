@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Search, LoaderCircle, Trash2, X } from "lucide-react";
+import { Search, Trash2, X, Music } from "lucide-react";
 import clsx from "clsx";
 
 import { Button } from "@/components/ui/button";
@@ -216,7 +216,7 @@ export function AlbumSearch() {
             <div ref={loadingRef} className="text-center py-8">
               {isLoading && (
                 <div className="flex items-center justify-center gap-2">
-                  <LoaderCircle className="h-6 w-6 animate-spin text-primary" />
+                  <Music className="h-6 w-6 animate-spin text-primary" />
                   <span className="text-muted-foreground">Cargando más álbumes...</span>
                 </div>
               )}

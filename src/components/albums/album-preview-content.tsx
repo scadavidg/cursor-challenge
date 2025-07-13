@@ -16,6 +16,7 @@ interface AlbumPreviewContentProps {
   loading: boolean;
   error: string | null;
   deezerLoading?: boolean;
+  songsBeingLoaded?: string[];
   selectedPreview: { url: string; trackName: string; source: string } | null;
   currentlyPlaying: string | null;
   onSelectPreview: (track: Track) => void;
@@ -32,6 +33,7 @@ export function AlbumPreviewContent({
   loading,
   error,
   deezerLoading,
+  songsBeingLoaded = [],
   selectedPreview,
   currentlyPlaying,
   onSelectPreview,
@@ -227,6 +229,12 @@ export function AlbumPreviewContent({
                           </div>
                         )}
                       </>
+                    ) : songsBeingLoaded.includes(track.name) && !track.preview_url ? (
+                      // Skeleton para canciones que están esperando previews de Deezer
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <div className="w-4 h-4 bg-muted animate-pulse rounded"></div>
+                        <span className="text-xs text-muted-foreground">Cargando...</span>
+                      </div>
                     ) : (
                       <Badge variant="outline" className="text-xs flex-shrink-0">
                         Sin preview

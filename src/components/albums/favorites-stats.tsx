@@ -1,12 +1,13 @@
 "use client";
 
 import { Heart, Music } from "lucide-react";
-import { useFavorites } from "@/contexts/favorites-context"; // Cambio de import para usar el contexto global
+import { useFavorites } from "@/contexts/favorites-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatsSkeleton } from "@/components/ui/skeleton";
+import type { Album } from "@/lib/types";
 
-export function FavoritesStats() {
-  const { favorites, isLoading } = useFavorites();
+export function FavoritesStats({ favorites = [], isLoading }: { favorites?: Album[], isLoading?: boolean }) {
+  const safeFavorites = Array.isArray(favorites) ? favorites : [];
 
   if (isLoading) {
     return (
@@ -22,8 +23,8 @@ export function FavoritesStats() {
     );
   }
 
-  const totalFavorites = favorites.length;
-  const uniqueArtists = new Set(favorites.map(album => album.artist)).size;
+  const totalFavorites = safeFavorites.length;
+  const uniqueArtists = new Set(safeFavorites.map(album => album.artist)).size;
 
   return (
     <div className="grid gap-4 md:grid-cols-2">

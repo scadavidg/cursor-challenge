@@ -13,10 +13,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "12", 10);
+
     const favoriteUseCases = container.createFavoriteUseCases(session.user.id);
-    const favorites = await favoriteUseCases.getFavorites();
-    
-    return createApiResponse(favorites);
+    const allFavorites = await favoriteUseCases.getFavorites();
+
+    // Paginación
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    const paginatedFavorites = allFavorites.slice(start, end);
+    const hasMore = end < allFavorites.length;
+
+    return createApiResponse({
+      favorites: paginatedFavorites,
+      page,
+      limit,
+      hasMore
+    });
   } catch (error) {
     return createErrorResponse(error, 500, 'Favorites API');
   }

@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/hooks/use-toast";
-import { LoaderCircle } from "lucide-react";
+import { Music } from "lucide-react";
 import { PasswordInput } from "./password-input";
 
 const formSchema = z.object({
@@ -94,7 +94,7 @@ export function LoginForm() {
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading && <Music className="mr-2 h-4 w-4 animate-spin" />}
               Iniciar sesión
             </Button>
             <div className="text-center space-y-2">

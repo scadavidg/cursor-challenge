@@ -49,7 +49,6 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    console.log("MONTANDO FAVORITES CONTEXT");
     fetchFavorites();
   }, [isAuthenticated]);
 
