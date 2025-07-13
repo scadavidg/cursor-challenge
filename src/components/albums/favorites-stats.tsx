@@ -1,11 +1,13 @@
 "use client";
 
 import { Heart, Music } from "lucide-react";
-import { useFavorites } from "@/hooks/use-favorites";
+import { useFavorites } from "@/contexts/favorites-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatsSkeleton } from "@/components/ui/skeleton";
+import type { Album } from "@/lib/types";
 
-export function FavoritesStats() {
-  const { favorites, isLoading } = useFavorites();
+export function FavoritesStats({ favorites = [], isLoading }: { favorites?: Album[], isLoading?: boolean }) {
+  const safeFavorites = Array.isArray(favorites) ? favorites : [];
 
   if (isLoading) {
     return (
@@ -15,17 +17,14 @@ export function FavoritesStats() {
           <Heart className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="animate-pulse">
-            <div className="h-4 bg-muted rounded w-1/2 mb-2"></div>
-            <div className="h-3 bg-muted rounded w-1/3"></div>
-          </div>
+          <StatsSkeleton />
         </CardContent>
       </Card>
     );
   }
 
-  const totalFavorites = favorites.length;
-  const uniqueArtists = new Set(favorites.map(album => album.artist)).size;
+  const totalFavorites = safeFavorites.length;
+  const uniqueArtists = new Set(safeFavorites.map(album => album.artist)).size;
 
   return (
     <div className="grid gap-4 md:grid-cols-2">

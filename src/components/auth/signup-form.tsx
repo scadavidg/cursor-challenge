@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/hooks/use-toast";
-import { LoaderCircle } from "lucide-react";
+import { Music } from "lucide-react";
 import { PasswordInput } from "./password-input";
 import { PasswordStrengthIndicator } from "./password-strength-indicator";
 
@@ -145,7 +145,13 @@ export function SignUpForm() {
                 <FormItem>
                   <FormLabel>Confirmar contraseña</FormLabel>
                   <FormControl>
-                    <PasswordInput placeholder="••••••••" {...field} />
+                    <PasswordInput 
+                      placeholder="••••••••" 
+                      {...field}
+                      onPaste={(e) => e.preventDefault()}
+                      onCopy={(e) => e.preventDefault()}
+                      onCut={(e) => e.preventDefault()}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -154,7 +160,7 @@ export function SignUpForm() {
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading && <Music className="mr-2 h-4 w-4 animate-spin" />}
               Crear cuenta
             </Button>
             <p className="text-sm text-muted-foreground">

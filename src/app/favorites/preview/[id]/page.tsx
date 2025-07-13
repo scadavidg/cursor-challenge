@@ -17,6 +17,7 @@ export default function AlbumPreviewPage({ params }: { params: Promise<{ id: str
     trackName: string;
     source: string;
   } | null>(null);
+  const [songsBeingLoaded, setSongsBeingLoaded] = React.useState<string[]>([]);
 
   // Hook para caché de álbumes
   const { 
@@ -48,7 +49,9 @@ export default function AlbumPreviewPage({ params }: { params: Promise<{ id: str
         .filter((track: any) => !track.preview_url)
         .map((track: any) => track.name);
       if (songsWithoutPreview.length > 0) {
+        setSongsBeingLoaded(songsWithoutPreview);
         await fetchPreviews(songsWithoutPreview);
+        setSongsBeingLoaded([]);
       }
     }
   };
@@ -122,6 +125,7 @@ export default function AlbumPreviewPage({ params }: { params: Promise<{ id: str
           loading={loading}
           error={error}
           deezerLoading={deezerLoading}
+          songsBeingLoaded={songsBeingLoaded}
           selectedPreview={selectedPreview}
           currentlyPlaying={currentlyPlaying}
           onSelectPreview={handleSelectPreview}

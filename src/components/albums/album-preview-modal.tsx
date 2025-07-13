@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EnhancedAudioPlayer } from "./enhanced-audio-player";
+import { AlbumDetailsSkeleton } from "@/components/ui/skeleton";
 import { useDeezerPreviews } from "@/hooks/use-deezer-previews";
 import type { Album, AlbumDetails, Track } from "@/lib/types";
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
@@ -154,12 +155,7 @@ export function AlbumPreviewModal({ album, isOpen, onClose }: AlbumPreviewModalP
           </DialogTitle>
         </DialogHeader>
 
-        {isLoading && (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-2 text-muted-foreground">Cargando detalles del álbum...</span>
-          </div>
-        )}
+        {isLoading && <AlbumDetailsSkeleton />}
 
         {error && (
           <div className="text-center py-12">

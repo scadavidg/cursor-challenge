@@ -19,8 +19,9 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/hooks/use-toast";
-import { LoaderCircle } from "lucide-react";
+import { Music } from "lucide-react";
 import { PasswordInput } from "./password-input";
+import { AuthFormSkeleton } from "@/components/ui/skeleton";
 
 const formSchema = z.object({
   email: z.string().min(1, { message: "El correo es obligatorio." }).email({ message: "Correo electrónico inválido." }),
@@ -29,7 +30,7 @@ const formSchema = z.object({
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -39,6 +40,10 @@ export function LoginForm() {
       password: "",
     },
   });
+
+  if (authLoading) {
+    return <AuthFormSkeleton />;
+  }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -50,9 +55,16 @@ export function LoginForm() {
         description: "¡Bienvenido de vuelta!",
       });
     } catch (error: any) {
+      let description = error.message || "Credenciales inválidas";
+      if (
+        description === "CredentialsSignin" ||
+        description.toLowerCase().includes("credentials")
+      ) {
+        description = "Correo o contraseña incorrectos. Por favor, verifica tus datos e inténtalo de nuevo.";
+      }
       toast({
         title: "Error de inicio de sesión",
-        description: error.message || "Credenciales inválidas",
+        description,
         variant: "destructive",
       });
     } finally {
@@ -94,7 +106,7 @@ export function LoginForm() {
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading && <Music className="mr-2 h-4 w-4 animate-spin" />}
               Iniciar sesión
             </Button>
             <div className="text-center space-y-2">
@@ -106,6 +118,12 @@ export function LoginForm() {
               </p>
               <p className="text-xs text-muted-foreground">
                 Crea una cuenta para probar la aplicación
+              </p>
+              <p className="text-xs text-muted-foreground">
+                ¿Olvidaste tu contraseña?{" "}
+                <Button variant="link" asChild className="p-0 h-auto text-xs">
+                  <Link href="/forgot-password">Recupérala aquí</Link>
+                </Button>
               </p>
             </div>
           </CardFooter>

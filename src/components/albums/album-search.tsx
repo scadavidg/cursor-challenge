@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Search, LoaderCircle, Trash2, X } from "lucide-react";
+import { Search, Trash2, X, Music } from "lucide-react";
 import clsx from "clsx";
 
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Input } from "@/components/ui/input";
 import { AlbumCard } from "./album-card";
 import { SearchSuggestions } from "./search-suggestions";
+import { AlbumGridSkeleton } from "@/components/ui/skeleton";
 import type { Album } from "@/lib/types";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 
@@ -48,17 +49,24 @@ export function AlbumSearch() {
     if (!currentQuery.trim()) {
       return { data: [], hasMore: false, page };
     }
-    const res = await fetch(`/api/albums/search?query=${encodeURIComponent(currentQuery)}&page=${page}&limit=12`);
-    if (!res.ok) throw new Error('Error al buscar álbumes');
-    const result = await res.json();
-    // Si el backend envía un mensaje cómico, guárdalo
-    if (result.funMessage) setFunMessage(result.funMessage);
-    else setFunMessage(null);
-    return {
-      data: result.albums as Album[],
-      hasMore: result.hasMore, // Usar el valor real del backend
-      page: result.page
-    };
+    try {
+      const res = await fetch(`/api/albums/search?query=${encodeURIComponent(currentQuery)}&page=${page}&limit=12`);
+      if (!res.ok) throw new Error('Error al buscar álbumes');
+      const result = await res.json();
+      // Compatibilidad con ambas formas de respuesta
+      const albums = result.albums || (result.data && result.data.albums) || [];
+      const hasMore = result.hasMore ?? (result.data && result.data.hasMore) ?? false;
+      const pageNum = result.page ?? (result.data && result.data.page) ?? page;
+      if (result.funMessage) setFunMessage(result.funMessage);
+      else setFunMessage(null);
+      return {
+        data: albums as Album[],
+        hasMore,
+        page: pageNum
+      };
+    } catch (error) {
+      return { data: [], hasMore: false, page };
+    }
   }, [currentQuery]);
 
   const {
@@ -121,6 +129,11 @@ export function AlbumSearch() {
     resetSearch();
   };
 
+  // Filtrar duplicados antes de renderizar:
+  const uniqueSearchResults = searchResults.filter(
+    (album, index, self) => self.findIndex(a => a.id === album.id) === index
+  );
+
   return (
     <div>
       <Form {...form}>
@@ -169,10 +182,9 @@ export function AlbumSearch() {
         </div>
       )}
 
-      {isLoading && (
-        <div className="text-center">
-          <LoaderCircle className="mx-auto h-12 w-12 animate-spin text-primary" />
-          <p className="mt-4 text-muted-foreground">Buscando álbumes...</p>
+      {isLoading && searchResults.length === 0 && (
+        <div className="space-y-6">
+          <AlbumGridSkeleton count={12} />
         </div>
       )}
 
@@ -191,10 +203,10 @@ export function AlbumSearch() {
         </div>
       )}
 
-      {searchResults.length > 0 && (
+      {uniqueSearchResults.length > 0 && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {searchResults.map((album) => (
+            {uniqueSearchResults.map((album) => (
               <AlbumCard key={album.id} album={album} variant="search" />
             ))}
           </div>
@@ -204,7 +216,7 @@ export function AlbumSearch() {
             <div ref={loadingRef} className="text-center py-8">
               {isLoading && (
                 <div className="flex items-center justify-center gap-2">
-                  <LoaderCircle className="h-6 w-6 animate-spin text-primary" />
+                  <Music className="h-6 w-6 animate-spin text-primary" />
                   <span className="text-muted-foreground">Cargando más álbumes...</span>
                 </div>
               )}

@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
-import { LoaderCircle, Music } from "lucide-react";
+import {  Music } from "lucide-react";
 
 import { AlbumCard } from "./album-card";
+import { AlbumGridSkeleton } from "@/components/ui/skeleton";
 import type { Album } from "@/lib/types";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { removeDuplicateAlbums, createAlbumLoadFunction } from "@/lib/album-utils";
@@ -39,6 +40,27 @@ export function FeaturedAlbums({
 
   // Filtrar álbumes duplicados por id
   const uniqueAlbums = removeDuplicateAlbums(albums);
+
+  // Filtrar duplicados antes de renderizar:
+  const uniqueAlbumsFiltered = uniqueAlbums.filter(
+    (album, index, self) => self.findIndex(a => a.id === album.id) === index
+  );
+
+  // Mostrar skeleton durante la carga inicial
+  if (isLoading && albums.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 mb-6">
+          <Music className="h-5 w-5 text-primary" />
+          <h2 className="text-2xl font-headline font-bold">{title}</h2>
+        </div>
+        {description && (
+          <p className="text-muted-foreground mb-6">{description}</p>
+        )}
+        <AlbumGridSkeleton count={12} />
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -79,7 +101,7 @@ export function FeaturedAlbums({
       )}
       
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {uniqueAlbums.map((album) => (
+        {uniqueAlbumsFiltered.map((album) => (
           <AlbumCard key={album.id} album={album} variant="search" />
         ))}
       </div>
@@ -89,7 +111,7 @@ export function FeaturedAlbums({
         <div ref={loadingRef} className="text-center py-8">
           {isLoading && (
             <div className="flex items-center justify-center gap-2">
-              <LoaderCircle className="h-6 w-6 animate-spin text-primary" />
+              <Music className="h-6 w-6 animate-spin text-primary" />
               <span className="text-muted-foreground">Cargando más álbumes...</span>
             </div>
           )}

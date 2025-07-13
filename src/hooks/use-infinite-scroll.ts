@@ -29,9 +29,13 @@ export function useInfiniteScroll<T>(
     
     try {
       const result = await loadMore(page);
-      setData(prev => [...prev, ...result.data]);
-      setHasMore(result.hasMore);
-      setPage(result.page + 1);
+      // Validación robusta:
+      const safeResult = result && Array.isArray(result.data)
+        ? result
+        : { data: [], hasMore: false, page };
+      setData(prev => [...prev, ...safeResult.data]);
+      setHasMore(safeResult.hasMore);
+      setPage(safeResult.page + 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load more data');
     } finally {

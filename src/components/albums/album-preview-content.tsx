@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EnhancedAudioPlayer } from "./enhanced-audio-player";
+import { AlbumDetailsSkeleton } from "@/components/ui/skeleton";
 import type { AlbumDetails, Track } from "@/lib/types";
 import { SpotifyIcon } from "@/components/ui/spotify-icon";
 import { DeezerIcon } from "@/components/ui/deezer-icon";
@@ -15,6 +16,7 @@ interface AlbumPreviewContentProps {
   loading: boolean;
   error: string | null;
   deezerLoading?: boolean;
+  songsBeingLoaded?: string[];
   selectedPreview: { url: string; trackName: string; source: string } | null;
   currentlyPlaying: string | null;
   onSelectPreview: (track: Track) => void;
@@ -31,6 +33,7 @@ export function AlbumPreviewContent({
   loading,
   error,
   deezerLoading,
+  songsBeingLoaded = [],
   selectedPreview,
   currentlyPlaying,
   onSelectPreview,
@@ -61,12 +64,7 @@ export function AlbumPreviewContent({
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2 text-muted-foreground">Cargando detalles del álbum...</span>
-      </div>
-    );
+    return <AlbumDetailsSkeleton />;
   }
 
   if (error) {
@@ -231,6 +229,12 @@ export function AlbumPreviewContent({
                           </div>
                         )}
                       </>
+                    ) : songsBeingLoaded.includes(track.name) && !track.preview_url ? (
+                      // Skeleton para canciones que están esperando previews de Deezer
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <div className="w-4 h-4 bg-muted animate-pulse rounded"></div>
+                        <span className="text-xs text-muted-foreground">Cargando...</span>
+                      </div>
                     ) : (
                       <Badge variant="outline" className="text-xs flex-shrink-0">
                         Sin preview

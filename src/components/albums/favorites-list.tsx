@@ -1,41 +1,86 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useFavorites } from "@/hooks/use-favorites";
+import { useState, useCallback, useEffect } from "react";
+import { useFavorites } from "@/contexts/favorites-context";
 import { AlbumCard } from "./album-card";
 import { Button } from "@/components/ui/button";
 import { FavoritesSearch } from "./favorites-search";
 import { FavoritesSort } from "./favorites-sort";
+import { AlbumGridSkeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { Music, Heart, Search } from "lucide-react";
 import type { Album } from "@/lib/types";
+import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { removeDuplicateAlbums, filterAlbumsByQuery, sortAlbums } from "@/lib/album-utils";
 
-export function FavoritesList() {
-  const { favorites, isLoading } = useFavorites();
+export function FavoritesList({ onFavoritesChange }: { onFavoritesChange?: (favorites: Album[]) => void }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortField, setSortField] = useState<"dateAdded" | "title" | "artist">("dateAdded");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
+  // Scroll infinito para favoritos paginados
+  const loadMoreFavorites = useCallback(async (page: number) => {
+    const res = await fetch(`/api/favorites?page=${page}&limit=12`);
+    if (!res.ok) throw new Error("Error al cargar favoritos");
+    const result = await res.json();
+    // Compatibilidad con ambas formas de respuesta
+    const favorites = (result.data && result.data.favorites) || result.favorites || [];
+    const hasMore = (result.data && result.data.hasMore) ?? result.hasMore ?? false;
+    const pageNum = (result.data && result.data.page) ?? result.page ?? page;
+    return {
+      data: favorites as Album[],
+      hasMore,
+      page: pageNum
+    };
+  }, []);
+
+  const {
+    data: favorites,
+    isLoading,
+    error,
+    hasMore,
+    reset,
+    loadingRef,
+    loadMore
+  } = useInfiniteScroll(loadMoreFavorites);
+
+  // Carga inicial automática
+  useEffect(() => {
+    if (favorites.length === 0 && !isLoading && hasMore) {
+      loadMore();
+    }
+  }, [favorites.length, isLoading, hasMore, loadMore]);
+
   // Filtrado local
-  const filteredFavorites = useMemo(() => filterAlbumsByQuery(favorites, searchQuery), [favorites, searchQuery]);
-
+  const filteredFavorites = filterAlbumsByQuery(favorites, searchQuery);
   // Ordenamiento local
-  const sortedFavorites = useMemo(() => sortAlbums(filteredFavorites, sortField, sortOrder), [filteredFavorites, sortField, sortOrder]);
-
+  const sortedFavorites = sortAlbums(filteredFavorites, sortField, sortOrder);
   // Elimina duplicados por id
-  const uniqueFavorites = useMemo(() => removeDuplicateAlbums(sortedFavorites), [sortedFavorites]);
+  const uniqueFavoritesFiltered = removeDuplicateAlbums(sortedFavorites).filter(
+    (album, index, self) => self.findIndex(a => a.id === album.id) === index
+  );
 
-  if (isLoading) {
+  useEffect(() => {
+    if (onFavoritesChange) {
+      onFavoritesChange(uniqueFavoritesFiltered);
+    }
+  }, [uniqueFavoritesFiltered.length, onFavoritesChange]);
+
+
+
+  if (isLoading && favorites.length === 0) {
     return (
-      <div className="text-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-        <p className="mt-4 text-muted-foreground">Cargando tus favoritos...</p>
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 mb-6">
+          <Music className="h-5 w-5 text-primary" />
+          <h2 className="text-2xl font-headline font-bold">Mis Favoritos</h2>
+        </div>
+        <AlbumGridSkeleton count={8} />
       </div>
     );
   }
 
-  if (favorites.length === 0) {
+  if (favorites.length === 0 && !isLoading) {
     return (
       <div className="text-center py-20 bg-accent/50 rounded-lg border-2 border-dashed">
         <Heart className="mx-auto h-16 w-16 text-muted-foreground" />
@@ -55,7 +100,7 @@ export function FavoritesList() {
       <div className="flex items-center gap-2 mb-6">
         <Heart className="h-5 w-5 text-primary" />
         <h2 className="text-2xl font-headline font-bold">Tus favoritos</h2>
-        <span className="text-sm text-muted-foreground">({sortedFavorites.length} álbumes)</span>
+        <span className="text-sm text-muted-foreground">({uniqueFavoritesFiltered.length} álbumes)</span>
       </div>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <FavoritesSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -66,7 +111,7 @@ export function FavoritesList() {
           setSortOrder={setSortOrder}
         />
       </div>
-      {uniqueFavorites.length === 0 ? (
+      {uniqueFavoritesFiltered.length === 0 ? (
         searchQuery.trim() === "" ? (
           <div className="text-center py-12">
             <Music className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
@@ -81,9 +126,26 @@ export function FavoritesList() {
         )
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {uniqueFavorites.map((album) => (
+          {uniqueFavoritesFiltered.map((album) => (
             <AlbumCard key={album.id} album={album} variant="favorite" />
           ))}
+        </div>
+      )}
+      {/* Infinite scroll loading indicator */}
+      {hasMore && (
+        <div ref={loadingRef} className="text-center py-8">
+          {isLoading && (
+            <div className="flex items-center justify-center gap-2">
+              <Music className="h-6 w-6 animate-spin text-primary" />
+              <span className="text-muted-foreground">Cargando más favoritos...</span>
+            </div>
+          )}
+        </div>
+      )}
+      {/* End of results indicator */}
+      {!hasMore && favorites.length > 0 && (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">¡Has llegado al final! Todos tus favoritos han sido cargados.</p>
         </div>
       )}
     </div>

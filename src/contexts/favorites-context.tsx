@@ -56,11 +56,9 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
     if (!isAuthenticated) {
       throw new Error("Debes iniciar sesión para agregar favoritos");
     }
-
     try {
       await FavoriteService.addFavorite(album);
-      // Actualizar la lista de favoritos
-      await fetchFavorites();
+      setFavorites(prev => [...prev, album]); // Actualiza localmente
     } catch (error) {
       throw error;
     }
@@ -71,11 +69,9 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
       throw new Error("Debes iniciar sesión para remover favoritos");
       return;
     }
-
     try {
       await FavoriteService.removeFavorite(albumId);
-      // Actualizar la lista de favoritos
-      await fetchFavorites();
+      setFavorites(prev => prev.filter(a => a.id !== albumId)); // Actualiza localmente
     } catch (error) {
       throw error;
     }

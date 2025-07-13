@@ -1,7 +1,7 @@
 "use client";
 
 import { Heart } from "lucide-react";
-import { useFavorites } from "@/hooks/use-favorites";
+import { useFavorites } from "@/contexts/favorites-context"; // Cambio de import para usar el contexto global
 import { cn } from "@/lib/utils";
 
 interface FavoriteIndicatorProps {
