@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -35,7 +35,7 @@ const resetPasswordSchema = z.object({
 
 type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isValidating, setIsValidating] = useState(true);
   const [isTokenValid, setIsTokenValid] = useState(false);
@@ -266,14 +266,20 @@ export default function ResetPasswordPage() {
                 )}
               />
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Cambiar contraseña
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Cambiando contraseña...
+                  </>
+                ) : (
+                  "Cambiar contraseña"
+                )}
               </Button>
             </form>
           </Form>
-          <div className="mt-6 text-center">
-            <Button asChild variant="ghost" className="w-full">
-              <Link href="/login">
+          <div className="mt-4 text-center">
+            <Button variant="link" asChild className="text-sm">
+              <Link href="/login" className="flex items-center justify-center">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Volver al login
               </Link>
@@ -282,5 +288,28 @@ export default function ResetPasswordPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 px-4">
+      <Card className="w-full max-w-md">
+        <CardContent className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <Loader2 className="mx-auto h-8 w-8 animate-spin text-purple-600 mb-4" />
+            <p className="text-muted-foreground">Cargando...</p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 } 
