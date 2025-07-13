@@ -10,7 +10,7 @@ export default function SignUpPage() {
           <h1 className="text-2xl font-bold text-primary">RockStack</h1>
         </div>
         <h2 className="text-center text-3xl font-bold font-headline tracking-tight text-foreground">
-          Create your account
+          Crea tu cuenta
         </h2>
       </div>
 

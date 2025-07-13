@@ -139,7 +139,7 @@ export function AlbumCard({ album, variant = "search" }: AlbumCardProps) {
                 title="Ver detalles y escuchar canciones"
               >
                 <Eye className="mr-2 h-4 w-4" />
-                Preview
+                Ver detalles
               </Button>
           <Button
             variant="destructive"

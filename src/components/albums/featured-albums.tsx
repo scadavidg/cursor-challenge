@@ -5,6 +5,7 @@ import {  Music } from "lucide-react";
 
 import { AlbumCard } from "./album-card";
 import { AlbumGridSkeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import type { Album } from "@/lib/types";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { removeDuplicateAlbums, createAlbumLoadFunction } from "@/lib/album-utils";
@@ -66,9 +67,9 @@ export function FeaturedAlbums({
     return (
       <div className="text-center py-20 bg-destructive/10 rounded-lg border border-destructive/20">
         <p className="text-destructive mb-4">Error: {error}</p>
-        <button className="btn" onClick={() => reset()}>
+        <Button variant="outline" onClick={() => reset()}>
           Intentar de nuevo
-        </button>
+        </Button>
       </div>
     );
   }
@@ -81,9 +82,9 @@ export function FeaturedAlbums({
         <p className="mt-2 text-muted-foreground">
           Hubo un error al cargar los álbumes.
         </p>
-        <button className="btn mt-6" onClick={() => reset()}>
+        <Button variant="outline" className="mt-6" onClick={() => reset()}>
           Recargar
-        </button>
+        </Button>
       </div>
     );
   }

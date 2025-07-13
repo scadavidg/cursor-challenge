@@ -160,7 +160,7 @@ export function AlbumSearch() {
                         onClick={handleClear}
                         className="absolute top-1/2 right-4 -translate-y-1/2 text-muted-foreground hover:text-destructive focus:outline-none"
                         tabIndex={0}
-                        aria-label="Clear search"
+                        aria-label="Limpiar búsqueda"
                       >
                         <X className="h-6 w-6" />
                       </button>
@@ -226,7 +226,7 @@ export function AlbumSearch() {
           {/* End of results indicator */}
           {!hasMore && searchResults.length > 0 && (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">No more albums to load</p>
+              <p className="text-muted-foreground">No hay más álbumes para cargar</p>
             </div>
           )}
         </div>
@@ -241,7 +241,7 @@ export function AlbumSearch() {
             className="mt-4"
             onClick={() => resetSearch()}
           >
-            Try Again
+            Intentar de nuevo
           </Button>
         </div>
       )}

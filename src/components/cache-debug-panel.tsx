@@ -8,6 +8,11 @@ import { cacheManager } from '@/lib/cache';
 import { RefreshCw, Trash2, Database, HardDrive } from 'lucide-react';
 
 export function CacheDebugPanel() {
+  // Ocultar en producción automáticamente
+  if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'development') {
+    return null;
+  }
+
   const [stats, setStats] = useState(cacheManager.getStats());
   const [isVisible, setIsVisible] = useState(false);
 
