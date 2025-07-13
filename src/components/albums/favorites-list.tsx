@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useFavorites } from "@/hooks/use-favorites";
+import { useFavorites } from "@/contexts/favorites-context"; // Cambio de import para usar el contexto global
 import { AlbumCard } from "./album-card";
 import { Button } from "@/components/ui/button";
 import { FavoritesSearch } from "./favorites-search";
@@ -26,6 +26,11 @@ export function FavoritesList() {
 
   // Elimina duplicados por id
   const uniqueFavorites = useMemo(() => removeDuplicateAlbums(sortedFavorites), [sortedFavorites]);
+
+  // Filtrar duplicados antes de renderizar:
+  const uniqueFavoritesFiltered = uniqueFavorites.filter(
+    (album, index, self) => self.findIndex(a => a.id === album.id) === index
+  );
 
   if (isLoading) {
     return (
@@ -70,7 +75,7 @@ export function FavoritesList() {
           setSortOrder={setSortOrder}
         />
       </div>
-      {uniqueFavorites.length === 0 ? (
+      {uniqueFavoritesFiltered.length === 0 ? (
         searchQuery.trim() === "" ? (
           <div className="text-center py-12">
             <Music className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
@@ -85,7 +90,7 @@ export function FavoritesList() {
         )
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {uniqueFavorites.map((album) => (
+          {uniqueFavoritesFiltered.map((album) => (
             <AlbumCard key={album.id} album={album} variant="favorite" />
           ))}
         </div>

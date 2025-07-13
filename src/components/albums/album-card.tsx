@@ -7,7 +7,7 @@ import { useState } from "react";
 import type { Album } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useFavorites } from "@/hooks/use-favorites";
+import { useFavorites } from "@/contexts/favorites-context"; // Cambio de import para usar el contexto global
 import { useToast } from "@/hooks/use-toast";
 import { AlbumPreviewModal } from "./album-preview-modal";
 import { useRouter } from "next/navigation";

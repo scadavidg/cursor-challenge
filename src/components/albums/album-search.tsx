@@ -129,6 +129,11 @@ export function AlbumSearch() {
     resetSearch();
   };
 
+  // Filtrar duplicados antes de renderizar:
+  const uniqueSearchResults = searchResults.filter(
+    (album, index, self) => self.findIndex(a => a.id === album.id) === index
+  );
+
   return (
     <div>
       <Form {...form}>
@@ -198,10 +203,10 @@ export function AlbumSearch() {
         </div>
       )}
 
-      {searchResults.length > 0 && (
+      {uniqueSearchResults.length > 0 && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {searchResults.map((album) => (
+            {uniqueSearchResults.map((album) => (
               <AlbumCard key={album.id} album={album} variant="search" />
             ))}
           </div>

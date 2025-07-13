@@ -2,6 +2,7 @@ import type { Album } from "@/lib/types";
 
 export class FavoriteService {
   static async getFavorites(): Promise<Album[]> {
+    console.log("LLAMANDO FavoriteService.getFavorites");
     const response = await fetch("/api/favorites");
     if (!response.ok) {
       throw new Error("Error al obtener favoritos");

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { cacheManager, CACHE_KEYS } from '@/lib/cache';
-import { useFavorites } from './use-favorites';
+import { useFavorites } from '@/contexts/favorites-context';
 
 export function useCacheInvalidation() {
   const { favorites } = useFavorites();

@@ -41,6 +41,11 @@ export function FeaturedAlbums({
   // Filtrar álbumes duplicados por id
   const uniqueAlbums = removeDuplicateAlbums(albums);
 
+  // Filtrar duplicados antes de renderizar:
+  const uniqueAlbumsFiltered = uniqueAlbums.filter(
+    (album, index, self) => self.findIndex(a => a.id === album.id) === index
+  );
+
   // Mostrar skeleton durante la carga inicial
   if (isLoading && albums.length === 0) {
     return (
@@ -96,7 +101,7 @@ export function FeaturedAlbums({
       )}
       
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {uniqueAlbums.map((album) => (
+        {uniqueAlbumsFiltered.map((album) => (
           <AlbumCard key={album.id} album={album} variant="search" />
         ))}
       </div>
