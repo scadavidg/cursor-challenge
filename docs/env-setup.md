@@ -10,6 +10,13 @@ DATABASE_URL="postgresql://username:password@host:port/database"
 NEXTAUTH_URL="http://localhost:9002"
 NEXTAUTH_SECRET="tu-clave-secreta-aqui"
 
+# SMTP Configuration (para recuperación de contraseña)
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT="587"
+SMTP_SECURE="false"
+SMTP_USER="tu-email@gmail.com"
+SMTP_PASS="tu-app-password"
+
 # Para producción, genera una clave secreta segura:
 # openssl rand -base64 32
 ```
@@ -37,4 +44,18 @@ Cuando agregues autenticación con Google, necesitarás estas variables adiciona
 # Google OAuth (para el futuro)
 GOOGLE_CLIENT_ID="tu-google-client-id"
 GOOGLE_CLIENT_SECRET="tu-google-client-secret"
-``` 
+```
+
+## Configuración de SMTP
+
+### Gmail
+1. **Habilitar 2FA** en tu cuenta de Google
+2. **Generar App Password**:
+   - Ve a Google Account Settings
+   - Security → 2-Step Verification → App passwords
+   - Genera una contraseña para "Mail"
+3. **Usar la App Password** en `SMTP_PASS`
+
+### Otros Proveedores
+- **Outlook**: `SMTP_HOST="smtp-mail.outlook.com"`
+- **SendGrid**: `SMTP_HOST="smtp.sendgrid.net"` 

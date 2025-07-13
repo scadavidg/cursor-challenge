@@ -145,7 +145,13 @@ export function SignUpForm() {
                 <FormItem>
                   <FormLabel>Confirmar contraseña</FormLabel>
                   <FormControl>
-                    <PasswordInput placeholder="••••••••" {...field} />
+                    <PasswordInput 
+                      placeholder="••••••••" 
+                      {...field}
+                      onPaste={(e) => e.preventDefault()}
+                      onCopy={(e) => e.preventDefault()}
+                      onCut={(e) => e.preventDefault()}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

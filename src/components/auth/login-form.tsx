@@ -21,6 +21,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { Music } from "lucide-react";
 import { PasswordInput } from "./password-input";
+import { AuthFormSkeleton } from "@/components/ui/skeleton";
 
 const formSchema = z.object({
   email: z.string().min(1, { message: "El correo es obligatorio." }).email({ message: "Correo electrónico inválido." }),
@@ -29,7 +30,7 @@ const formSchema = z.object({
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -39,6 +40,10 @@ export function LoginForm() {
       password: "",
     },
   });
+
+  if (authLoading) {
+    return <AuthFormSkeleton />;
+  }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -50,9 +55,16 @@ export function LoginForm() {
         description: "¡Bienvenido de vuelta!",
       });
     } catch (error: any) {
+      let description = error.message || "Credenciales inválidas";
+      if (
+        description === "CredentialsSignin" ||
+        description.toLowerCase().includes("credentials")
+      ) {
+        description = "Correo o contraseña incorrectos. Por favor, verifica tus datos e inténtalo de nuevo.";
+      }
       toast({
         title: "Error de inicio de sesión",
-        description: error.message || "Credenciales inválidas",
+        description,
         variant: "destructive",
       });
     } finally {
@@ -106,6 +118,12 @@ export function LoginForm() {
               </p>
               <p className="text-xs text-muted-foreground">
                 Crea una cuenta para probar la aplicación
+              </p>
+              <p className="text-xs text-muted-foreground">
+                ¿Olvidaste tu contraseña?{" "}
+                <Button variant="link" asChild className="p-0 h-auto text-xs">
+                  <Link href="/forgot-password">Recupérala aquí</Link>
+                </Button>
               </p>
             </div>
           </CardFooter>
