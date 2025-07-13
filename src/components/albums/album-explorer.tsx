@@ -7,6 +7,7 @@ import { AlbumCard } from "./album-card";
 import { Button } from "@/components/ui/button";
 import type { Album } from "@/lib/types";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
+import { removeDuplicateAlbums, createAlbumLoadFunction } from "@/lib/album-utils";
 
 interface AlbumExplorerProps {
   title?: string;
@@ -18,16 +19,7 @@ export function AlbumExplorer({
   description 
 }: AlbumExplorerProps = {}) {
   // Infinite scroll for all albums
-  const loadMoreAlbums = useCallback(async (page: number) => {
-    const res = await fetch(`/api/albums/rock?page=${page}&limit=12`);
-    if (!res.ok) throw new Error('Error al cargar álbumes');
-    const result = await res.json();
-    return {
-      data: result.albums as Album[],
-      hasMore: result.albums.length === 12, // Si la página está llena, puede haber más
-      page: result.page
-    };
-  }, []);
+  const loadMoreAlbums = useCallback(createAlbumLoadFunction("/api/albums/rock"), []);
 
   const {
     data: albums,
@@ -39,7 +31,7 @@ export function AlbumExplorer({
   } = useInfiniteScroll(loadMoreAlbums);
 
   // Filtrar álbumes duplicados por id
-  const uniqueAlbums = Array.from(new Map(albums.map(a => [a.id, a])).values());
+  const uniqueAlbums = removeDuplicateAlbums(albums);
 
   if (error) {
     return (

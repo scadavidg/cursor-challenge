@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { logger } from "@/lib/logger";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
@@ -12,9 +13,9 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 async function testDbConnection() {
   try {
     await prisma.$connect();
-    console.log('[DB] Conexión a la base de datos exitosa');
+    logger.info('[DB] Conexión a la base de datos exitosa', 'Prisma');
   } catch (error) {
-    console.error('[DB] Error de conexión a la base de datos:', error);
+    logger.error('[DB] Error de conexión a la base de datos:', 'Prisma', error);
   }
 }
 

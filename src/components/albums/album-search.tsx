@@ -56,7 +56,7 @@ export function AlbumSearch() {
     else setFunMessage(null);
     return {
       data: result.albums as Album[],
-      hasMore: result.albums.length === 12,
+      hasMore: result.hasMore, // Usar el valor real del backend
       page: result.page
     };
   }, [currentQuery]);
@@ -78,7 +78,7 @@ export function AlbumSearch() {
     if (hasSearched && currentQuery.trim().length > 0 && searchResults.length === 0 && !isLoading && hasMore) {
       loadMore();
     }
-  }, [hasSearched, currentQuery, searchResults.length, isLoading, hasMore, loadMore]);
+  }, [hasSearched, currentQuery, searchResults.length, isLoading, hasMore]);
 
   // Load initial albums when no search is performed
   useEffect(() => {

@@ -7,7 +7,8 @@ import { Music2, LogOut, Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import * as React from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 export function Header() {
   const { isAuthenticated, logout, user } = useAuth();
@@ -58,10 +59,14 @@ export function Header() {
         </button>
         <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
           <DialogContent className="p-0 w-[90vw] max-w-xs top-0 right-0 left-auto bottom-0 fixed h-full rounded-none sm:rounded-lg">
+            <VisuallyHidden>
+              <DialogTitle>Menú de navegación</DialogTitle>
+              <DialogDescription>Menú de navegación móvil con opciones para acceder a Home, Favoritos y cerrar sesión</DialogDescription>
+            </VisuallyHidden>
             <nav className="flex flex-col gap-2 p-6">
-              <Button variant="ghost" className="justify-start" onClick={() => { router.push('/home'); setMenuOpen(false); }}>Home</Button>
-              <Button variant="ghost" className="justify-start" onClick={() => { router.push('/favorites'); setMenuOpen(false); }}>Favoritos</Button>
-              <Button variant="ghost" className="justify-start" onClick={() => { logout(); setMenuOpen(false); }}>
+              <Button variant="ghost" className="justify-start text-black" onClick={() => { router.push('/home'); setMenuOpen(false); }}>Home</Button>
+              <Button variant="ghost" className="justify-start text-black" onClick={() => { router.push('/favorites'); setMenuOpen(false); }}>Favoritos</Button>
+              <Button variant="ghost" className="justify-start text-black" onClick={() => { logout(); setMenuOpen(false); }}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Sign out
               </Button>

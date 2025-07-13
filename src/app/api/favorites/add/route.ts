@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { container } from "@/infrastructure/di/container";
 import type { Album } from "@/lib/types";
+import { createApiResponse, createErrorResponse } from "@/lib/api-utils";
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,20 +23,8 @@ export async function POST(request: NextRequest) {
     const favoriteUseCases = container.createFavoriteUseCases(session.user.id);
     await favoriteUseCases.addFavorite(album);
     
-    return NextResponse.json({ 
-      message: "Álbum agregado a favoritos",
-      album 
-    });
+    return createApiResponse({ message: "Álbum agregado a favoritos" });
   } catch (error) {
-    console.error('[Add Favorite API] Error:', error);
-    
-    if (error instanceof Error && error.message.includes("ya está en tus favoritos")) {
-      return NextResponse.json({ error: error.message }, { status: 409 });
-    }
-    
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Error interno del servidor" },
-      { status: 500 }
-    );
+    return createErrorResponse(error, 500, 'Add Favorite API');
   }
 } 

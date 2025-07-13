@@ -7,7 +7,7 @@ export class FavoriteService {
       throw new Error("Error al obtener favoritos");
     }
     const data = await response.json();
-    return data.favorites || [];
+    return data.data || [];
   }
 
   static async addFavorite(album: Album): Promise<void> {

@@ -2,12 +2,13 @@
 // Ejecutar en la consola del navegador para verificar funcionamiento
 
 import { cacheManager, CACHE_KEYS } from './cache';
+import { TestLogger } from "./test-utils";
 
 export async function testCacheSystem() {
-  console.log('🧪 Iniciando pruebas del sistema de caché...\n');
+  TestLogger.log('🧪 Iniciando pruebas del sistema de caché...\n');
 
   // Test 1: Configuración inicial
-  console.log('📊 Estadísticas iniciales:', cacheManager.getStats());
+  TestLogger.log('📊 Estadísticas iniciales:', cacheManager.getStats());
 
   // Test 2: Guardar y recuperar datos
   const testData = {
@@ -17,34 +18,34 @@ export async function testCacheSystem() {
     tracks: ['Track 1', 'Track 2', 'Track 3']
   };
 
-  console.log('\n💾 Guardando datos de prueba...');
+  TestLogger.log('\n💾 Guardando datos de prueba...');
   await cacheManager.set(CACHE_KEYS.ALBUM_DETAILS, 'test-album-123', testData);
   
-  console.log('📖 Recuperando datos...');
+  TestLogger.log('📖 Recuperando datos...');
   const retrievedData = await cacheManager.get(CACHE_KEYS.ALBUM_DETAILS, 'test-album-123');
   
   if (retrievedData && JSON.stringify(retrievedData) === JSON.stringify(testData)) {
-    console.log('✅ Test 2 PASADO: Datos guardados y recuperados correctamente');
+    TestLogger.testResult('Test 2', true, 'Datos guardados y recuperados correctamente');
   } else {
-    console.log('❌ Test 2 FALLIDO: Error en guardado/recuperación');
+    TestLogger.testResult('Test 2', false, 'Error en guardado/recuperación');
   }
 
   // Test 3: Verificar estadísticas después de guardar
-  console.log('\n📊 Estadísticas después de guardar:', cacheManager.getStats());
+  TestLogger.log('\n📊 Estadísticas después de guardar:', cacheManager.getStats());
 
   // Test 4: Invalidación específica
-  console.log('\n🗑️ Probando invalidación específica...');
+  TestLogger.log('\n🗑️ Probando invalidación específica...');
   await cacheManager.invalidate(CACHE_KEYS.ALBUM_DETAILS, 'test-album-123');
   const afterInvalidation = await cacheManager.get(CACHE_KEYS.ALBUM_DETAILS, 'test-album-123');
   
   if (afterInvalidation === null) {
-    console.log('✅ Test 4 PASADO: Invalidación específica funciona');
+    TestLogger.testResult('Test 4', true, 'Invalidación específica funciona');
   } else {
-    console.log('❌ Test 4 FALLIDO: Invalidación específica no funciona');
+    TestLogger.testResult('Test 4', false, 'Invalidación específica no funciona');
   }
 
   // Test 5: Múltiples items
-  console.log('\n📦 Probando múltiples items...');
+  TestLogger.log('\n📦 Probando múltiples items...');
   const testItems = [
     { id: 'album-1', name: 'Album 1' },
     { id: 'album-2', name: 'Album 2' },
@@ -55,10 +56,10 @@ export async function testCacheSystem() {
     await cacheManager.set(CACHE_KEYS.ALBUM_DETAILS, item.id, item);
   }
 
-  console.log('📊 Estadísticas con múltiples items:', cacheManager.getStats());
+  TestLogger.log('📊 Estadísticas con múltiples items:', cacheManager.getStats());
 
   // Test 6: Invalidación por prefijo
-  console.log('\n🗑️ Probando invalidación por prefijo...');
+  TestLogger.log('\n🗑️ Probando invalidación por prefijo...');
   await cacheManager.invalidate(CACHE_KEYS.ALBUM_DETAILS);
   
   const allRetrieved = await Promise.all(
@@ -67,28 +68,28 @@ export async function testCacheSystem() {
   
   const allNull = allRetrieved.every(item => item === null);
   if (allNull) {
-    console.log('✅ Test 6 PASADO: Invalidación por prefijo funciona');
+    TestLogger.testResult('Test 6', true, 'Invalidación por prefijo funciona');
   } else {
-    console.log('❌ Test 6 FALLIDO: Invalidación por prefijo no funciona');
+    TestLogger.testResult('Test 6', false, 'Invalidación por prefijo no funciona');
   }
 
   // Test 7: Limpieza completa
-  console.log('\n🧹 Probando limpieza completa...');
+  TestLogger.log('\n🧹 Probando limpieza completa...');
   await cacheManager.clear();
-  console.log('📊 Estadísticas después de limpieza:', cacheManager.getStats());
+  TestLogger.log('📊 Estadísticas después de limpieza:', cacheManager.getStats());
 
-  console.log('\n🎉 Pruebas completadas!');
+  TestLogger.log('\n🎉 Pruebas completadas!');
 }
 
 // Función para probar rendimiento
 export async function testCachePerformance() {
-  console.log('⚡ Iniciando pruebas de rendimiento...\n');
+  TestLogger.log('⚡ Iniciando pruebas de rendimiento...\n');
 
   const iterations = 100;
   const testData = { id: 'perf-test', data: 'x'.repeat(1000) };
 
   // Test sin caché (simulado)
-  console.log('📊 Probando sin caché...');
+  TestLogger.log('📊 Probando sin caché...');
   const startWithoutCache = performance.now();
   
   for (let i = 0; i < iterations; i++) {
@@ -97,10 +98,10 @@ export async function testCachePerformance() {
   }
   
   const timeWithoutCache = performance.now() - startWithoutCache;
-  console.log(`⏱️ Tiempo sin caché: ${timeWithoutCache.toFixed(2)}ms`);
+  TestLogger.performanceTest('Tiempo sin caché', timeWithoutCache);
 
   // Test con caché
-  console.log('\n📊 Probando con caché...');
+  TestLogger.log('\n📊 Probando con caché...');
   const startWithCache = performance.now();
   
   for (let i = 0; i < iterations; i++) {
@@ -108,17 +109,17 @@ export async function testCachePerformance() {
   }
   
   const timeWithCache = performance.now() - startWithCache;
-  console.log(`⏱️ Tiempo con caché: ${timeWithCache.toFixed(2)}ms`);
+  TestLogger.performanceTest('Tiempo con caché', timeWithCache);
 
   const improvement = ((timeWithoutCache - timeWithCache) / timeWithoutCache) * 100;
-  console.log(`🚀 Mejora de rendimiento: ${improvement.toFixed(1)}%`);
+  TestLogger.performanceTest('Mejora de rendimiento', improvement);
 }
 
 // Función para limpiar datos de prueba
 export async function cleanupTestData() {
-  console.log('🧹 Limpiando datos de prueba...');
+  TestLogger.log('🧹 Limpiando datos de prueba...');
   await cacheManager.clear();
-  console.log('✅ Datos de prueba eliminados');
+  TestLogger.log('✅ Datos de prueba eliminados');
 }
 
 // Exportar funciones para uso en consola
@@ -127,8 +128,8 @@ if (typeof window !== 'undefined') {
   (window as any).testCachePerformance = testCachePerformance;
   (window as any).cleanupTestData = cleanupTestData;
   
-  console.log('🔧 Funciones de prueba disponibles:');
-  console.log('- testCacheSystem()');
-  console.log('- testCachePerformance()');
-  console.log('- cleanupTestData()');
+  TestLogger.log('🔧 Funciones de prueba disponibles:');
+  TestLogger.log('- testCacheSystem()');
+  TestLogger.log('- testCachePerformance()');
+  TestLogger.log('- cleanupTestData()');
 } 

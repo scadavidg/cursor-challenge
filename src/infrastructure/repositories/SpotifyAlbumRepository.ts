@@ -10,9 +10,12 @@ export class SpotifyAlbumRepository implements IAlbumRepository {
     return data.items.map((item: any) => Album.fromSpotify(item));
   }
 
-  async searchRockAlbums(query: string, page: number = 1, limit: number = 12): Promise<Album[]> {
+  async searchRockAlbums(query: string, page: number = 1, limit: number = 12): Promise<{ albums: Album[], hasMore: boolean }> {
     const data = await this.spotifyService.searchRockAlbums(query, page, limit);
-    return data.items.map((item: any) => Album.fromSpotify(item));
+    const albums = data.items.map((item: any) => Album.fromSpotify(item));
+    const total = data.total;
+    const hasMore = page * limit < total;
+    return { albums, hasMore };
   }
 
   async getAlbumDetails(albumId: string): Promise<any> {

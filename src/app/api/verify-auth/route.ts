@@ -46,6 +46,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ isAuthenticated: false, message: "No autenticado" }, { status: 401 });
     }
     const token = authHeader.replace("Bearer ", "");
+    if (!token) {
+      return NextResponse.json({ isAuthenticated: false, message: "No autenticado" }, { status: 401 });
+    }
     const authService = new AuthService();
     const payload = await authService.verifyToken(token);
     if (!payload || !payload.id) {

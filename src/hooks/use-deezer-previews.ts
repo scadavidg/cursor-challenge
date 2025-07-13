@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { cacheManager, CACHE_KEYS } from "@/lib/cache";
+import { logger } from "@/lib/logger";
 
 interface UseDeezerPreviewsReturn {
   previews: Record<string, string | null>;
@@ -29,7 +30,7 @@ export function useDeezerPreviews(): UseDeezerPreviewsReturn {
 
     try {
       // Crear una clave única para este conjunto de canciones
-      const songNamesKey = newSongNames.sort().join('|');
+      const songNamesKey = newSongNames.sort((a, b) => a.localeCompare(b)).join('|');
       
       // Intentar obtener del caché primero
       const cachedData = await cacheManager.get<Record<string, string | null>>(
@@ -54,7 +55,7 @@ export function useDeezerPreviews(): UseDeezerPreviewsReturn {
       });
 
       if (!response.ok) {
-        console.error('[useDeezerPreviews] Error al obtener previews de Deezer:', response.status);
+        logger.error('[useDeezerPreviews] Error al obtener previews de Deezer:', 'useDeezerPreviews', response.status);
         throw new Error("Error al obtener previews de Deezer");
       }
 
@@ -72,7 +73,7 @@ export function useDeezerPreviews(): UseDeezerPreviewsReturn {
       setPreviews(prev => ({ ...prev, ...previewsMap }));
       setIsFromCache(false);
     } catch (err) {
-      console.error('[useDeezerPreviews] Error en fetchPreviews:', err);
+      logger.error('[useDeezerPreviews] Error en fetchPreviews:', 'useDeezerPreviews', err);
       setError(err instanceof Error ? err.message : "Error desconocido");
     } finally {
       setIsLoading(false);

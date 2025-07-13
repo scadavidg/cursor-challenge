@@ -1,6 +1,7 @@
 const DEEZER_API_URL = "https://api.deezer.com";
 
 import { IExternalMusicService } from "@/domain/services/IExternalMusicService";
+import { logger } from "@/lib/logger";
 
 export class DeezerService implements IExternalMusicService {
   private async fetchDeezer(endpoint: string, params: Record<string, any> = {}) {
@@ -84,7 +85,7 @@ export class DeezerService implements IExternalMusicService {
       
       return null;
     } catch (error) {
-      console.error(`[DeezerService] Error al obtener preview para '${songName}':`, error);
+      logger.error(`[DeezerService] Error al obtener preview para '${songName}':`, 'DeezerService', error);
       return null;
     }
   }

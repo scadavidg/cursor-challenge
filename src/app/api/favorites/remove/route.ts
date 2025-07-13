@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { container } from "@/infrastructure/di/container";
+import { createApiResponse, createErrorResponse } from "@/lib/api-utils";
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -21,20 +22,8 @@ export async function DELETE(request: NextRequest) {
     const favoriteUseCases = container.createFavoriteUseCases(session.user.id);
     await favoriteUseCases.removeFavorite(albumId);
     
-    return NextResponse.json({ 
-      message: "Álbum removido de favoritos",
-      albumId 
-    });
+    return createApiResponse({ message: "Álbum eliminado de favoritos" });
   } catch (error) {
-    console.error('[Remove Favorite API] Error:', error);
-    
-    if (error instanceof Error && error.message.includes("no estaba en tus favoritos")) {
-      return NextResponse.json({ error: error.message }, { status: 404 });
-    }
-    
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Error interno del servidor" },
-      { status: 500 }
-    );
+    return createErrorResponse(error, 500, 'Remove Favorite API');
   }
 } 

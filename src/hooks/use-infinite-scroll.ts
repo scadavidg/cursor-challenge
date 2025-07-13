@@ -39,6 +39,14 @@ export function useInfiniteScroll<T>(
     }
   }, [loadMore, page, isLoading, hasMore]);
 
+  // Memoize the observer callback to prevent unnecessary re-renders
+  const observerCallback = useCallback((entries: IntersectionObserverEntry[]) => {
+    const [entry] = entries;
+    if (entry.isIntersecting && hasMore && !isLoading) {
+      loadMoreData();
+    }
+  }, [hasMore, isLoading, loadMoreData]);
+
   const reset = useCallback(() => {
     setData([]);
     setPage(1);
@@ -50,18 +58,10 @@ export function useInfiniteScroll<T>(
   useEffect(() => {
     if (!enabled || !loadingRef.current) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting && hasMore && !isLoading) {
-          loadMoreData();
-        }
-      },
-      {
-        threshold,
-        rootMargin,
-      }
-    );
+    const observer = new IntersectionObserver(observerCallback, {
+      threshold,
+      rootMargin,
+    });
 
     observerRef.current = observer;
     observer.observe(loadingRef.current);
@@ -71,7 +71,7 @@ export function useInfiniteScroll<T>(
         observerRef.current.disconnect();
       }
     };
-  }, [loadMoreData, hasMore, isLoading, threshold, rootMargin, enabled]);
+  }, [observerCallback, threshold, rootMargin, enabled]);
 
   return {
     data,
