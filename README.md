@@ -58,6 +58,12 @@ Aplicación fullstack con Clean Architecture, integración con Spotify, Deezer y
 
 ---
 
+## 🧱 Arquitectura
+
+La aplicación sigue los principios de Clean Architecture, separando responsabilidades en capas bien definidas (Presentación, Aplicación, Infraestructura y Dominio).
+
+![Arquitectura Clean Architecture](docs/Arquitectura.png)
+
 ## 🖼️ UI y Experiencia de Usuario
 
 - UI responsive con Tailwind CSS

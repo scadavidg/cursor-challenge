@@ -116,4 +116,18 @@ function AuthFormSkeleton() {
   )
 }
 
+export function PreviewListSkeleton({ count = 8 }: { count?: number }) {
+  return (
+    <div className="space-y-2">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="flex items-center gap-3 p-2 bg-muted/30 rounded-lg animate-pulse">
+          <div className="h-4 w-4 bg-muted rounded" />
+          <div className="flex-1 h-4 bg-muted rounded" />
+          <div className="h-4 w-10 bg-muted rounded ml-2" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export { Skeleton, AlbumCardSkeleton, AlbumGridSkeleton, AlbumDetailsSkeleton, StatsSkeleton, AuthFormSkeleton }

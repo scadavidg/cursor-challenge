@@ -7,11 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { cacheManager } from '@/lib/cache';
 import { RefreshCw, Trash2, Database, HardDrive } from 'lucide-react';
 
+// Ocultar completamente el panel y el botón si no es desarrollo
+const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
+
 export function CacheDebugPanel() {
-  // Ocultar en producción automáticamente
-  if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'development') {
-    return null;
-  }
+  if (!isDev) return null;
 
   const [stats, setStats] = useState(cacheManager.getStats());
   const [isVisible, setIsVisible] = useState(false);
@@ -21,7 +21,6 @@ export function CacheDebugPanel() {
   };
 
   useEffect(() => {
-    // Actualizar stats cada 5 segundos
     const interval = setInterval(updateStats, 5000);
     return () => clearInterval(interval);
   }, []);
@@ -85,7 +84,6 @@ export function CacheDebugPanel() {
             </Badge>
           </div>
         </div>
-        
         <div className="flex gap-2">
           <Button
             variant="outline"

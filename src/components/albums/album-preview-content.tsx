@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EnhancedAudioPlayer } from "./enhanced-audio-player";
-import { AlbumDetailsSkeleton } from "@/components/ui/skeleton";
+import { AlbumDetailsSkeleton, PreviewListSkeleton } from "@/components/ui/skeleton";
 import type { AlbumDetails, Track } from "@/lib/types";
 import { SpotifyIcon } from "@/components/ui/spotify-icon";
 import { DeezerIcon } from "@/components/ui/deezer-icon";
@@ -156,96 +156,100 @@ export function AlbumPreviewContent({
             {albumDetails.tracks.items.length} canciones
           </Badge>
         </div>
-        <ScrollArea className="max-h-[50vh] pr-2 pb-6">
-          <div className="space-y-1">
-            {albumDetails.tracks.items.map((track: Track) => {
-              const previewUrl = getPreviewUrl(track);
-              const previewSource = getPreviewSource(track);
-              const isSelected = selectedPreview && selectedPreview.trackName === track.name;
-              const isCurrentlyPlaying = currentlyPlaying === track.name;
-              return (
-                <div
-                  key={track.id}
-                  className={
-                    `flex flex-row items-center p-2 rounded-lg transition-colors cursor-pointer ` +
-                    (isSelected ? 'bg-primary/10 border-2 border-primary' : 'bg-muted/30 hover:bg-muted/50') +
-                    (isCurrentlyPlaying ? ' ring-2 ring-primary/50' : '')
-                  }
-                  onClick={() => {
-                    if (isSelected) {
-                      onTogglePlay(track.name);
-                    } else {
-                      onSelectPreview(track);
+        {deezerLoading ? (
+          <PreviewListSkeleton count={albumDetails.tracks.items.length || 8} />
+        ) : (
+          <ScrollArea className="max-h-[50vh] pr-2 pb-6">
+            <div className="space-y-1">
+              {albumDetails.tracks.items.map((track: Track) => {
+                const previewUrl = getPreviewUrl(track);
+                const previewSource = getPreviewSource(track);
+                const isSelected = selectedPreview && selectedPreview.trackName === track.name;
+                const isCurrentlyPlaying = currentlyPlaying === track.name;
+                return (
+                  <div
+                    key={track.id}
+                    className={
+                      `flex flex-row items-center p-2 rounded-lg transition-colors cursor-pointer ` +
+                      (isSelected ? 'bg-primary/10 border-2 border-primary' : 'bg-muted/30 hover:bg-muted/50') +
+                      (isCurrentlyPlaying ? ' ring-2 ring-primary/50' : '')
                     }
-                  }}
-                >
-                  <span className="text-xs text-muted-foreground w-6 flex-shrink-0 text-center">
-                    {track.track_number}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <span className="block min-w-0 truncate text-sm font-medium">
-                      {track.name.length > 30 ? track.name.slice(0, 30) + '...' : track.name}
+                    onClick={() => {
+                      if (isSelected) {
+                        onTogglePlay(track.name);
+                      } else {
+                        onSelectPreview(track);
+                      }
+                    }}
+                  >
+                    <span className="text-xs text-muted-foreground w-6 flex-shrink-0 text-center">
+                      {track.track_number}
                     </span>
-                  </div>
-                  <div className="flex items-center gap-1 flex-shrink-0 ml-2">
-                    {previewSource && (
-                      <span className="hidden xs:inline text-xs text-muted-foreground">
-                        {previewSource}
+                    <div className="flex-1 min-w-0">
+                      <span className="block min-w-0 truncate text-sm font-medium">
+                        {track.name.length > 30 ? track.name.slice(0, 30) + '...' : track.name}
                       </span>
-                    )}
-                    <span className="text-xs text-muted-foreground">
-                      {formatDuration(track.duration_ms)}
-                    </span>
-                    {previewUrl ? (
-                      <>
-                        {getPreviewSource(track) === "Spotify" && (
-                          <a
-                            href={track.external_urls?.spotify}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title="Ver en Spotify"
-                            onClick={e => e.stopPropagation()}
-                          >
-                            <SpotifyIcon className="w-5 h-5" />
-                          </a>
-                        )}
-                        {getPreviewSource(track) === "Deezer" && (
-                          <a
-                            href={`https://www.deezer.com/search/${encodeURIComponent(track.name)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title="Ver en Deezer"
-                            onClick={e => e.stopPropagation()}
-                          >
-                            <DeezerIcon className="w-5 h-5" />
-                          </a>
-                        )}
-                        {isCurrentlyPlaying && (
-                          <EqualizerBars className="w-5 h-5 text-primary animate-pulse" />
-                        )}
-                        {isSelected && !isCurrentlyPlaying && (
-                          <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
-                            <div className="w-2 h-2 rounded-full bg-primary"></div>
-                          </div>
-                        )}
-                      </>
-                    ) : songsBeingLoaded.includes(track.name) && !track.preview_url ? (
-                      // Skeleton para canciones que están esperando previews de Deezer
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <div className="w-4 h-4 bg-muted animate-pulse rounded"></div>
-                        <span className="text-xs text-muted-foreground">Cargando...</span>
-                      </div>
-                    ) : (
-                      <Badge variant="outline" className="text-xs flex-shrink-0">
-                        Sin preview
-                      </Badge>
-                    )}
+                    </div>
+                    <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                      {previewSource && (
+                        <span className="hidden xs:inline text-xs text-muted-foreground">
+                          {previewSource}
+                        </span>
+                      )}
+                      <span className="text-xs text-muted-foreground">
+                        {formatDuration(track.duration_ms)}
+                      </span>
+                      {previewUrl ? (
+                        <>
+                          {getPreviewSource(track) === "Spotify" && (
+                            <a
+                              href={track.external_urls?.spotify}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="Ver en Spotify"
+                              onClick={e => e.stopPropagation()}
+                            >
+                              <SpotifyIcon className="w-5 h-5" />
+                            </a>
+                          )}
+                          {getPreviewSource(track) === "Deezer" && (
+                            <a
+                              href={`https://www.deezer.com/search/${encodeURIComponent(track.name)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="Ver en Deezer"
+                              onClick={e => e.stopPropagation()}
+                            >
+                              <DeezerIcon className="w-5 h-5" />
+                            </a>
+                          )}
+                          {isCurrentlyPlaying && (
+                            <EqualizerBars className="w-5 h-5 text-primary animate-pulse" />
+                          )}
+                          {isSelected && !isCurrentlyPlaying && (
+                            <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
+                              <div className="w-2 h-2 rounded-full bg-primary"></div>
+                            </div>
+                          )}
+                        </>
+                      ) : songsBeingLoaded.includes(track.name) && !track.preview_url ? (
+                        // Skeleton para canciones que están esperando previews de Deezer
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <div className="w-4 h-4 bg-muted animate-pulse rounded"></div>
+                          <span className="text-xs text-muted-foreground">Cargando...</span>
+                        </div>
+                      ) : (
+                        <Badge variant="outline" className="text-xs flex-shrink-0">
+                          Sin preview
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </ScrollArea>
+                );
+              })}
+            </div>
+          </ScrollArea>
+        )}
       </div>
     </div>
   );
