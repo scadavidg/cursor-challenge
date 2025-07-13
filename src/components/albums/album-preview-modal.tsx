@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -143,6 +144,9 @@ export function AlbumPreviewModal({ album, isOpen, onClose }: AlbumPreviewModalP
           <DialogTitle>
             {album?.title || "Detalles del álbum"}
           </DialogTitle>
+          <DialogDescription>
+            Vista detallada del álbum {album?.title} con información de canciones, previews de audio y enlaces externos
+          </DialogDescription>
         </VisuallyHidden>
         <DialogHeader>
           <DialogTitle className="text-2xl font-headline">

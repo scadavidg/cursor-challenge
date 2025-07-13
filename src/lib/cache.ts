@@ -1,3 +1,5 @@
+import { logger } from "./logger";
+
 interface CacheItem<T> {
   data: T;
   timestamp: number;
@@ -38,27 +40,30 @@ class CacheManager {
   }
 
   private cleanupExpired(): void {
-    // Limpiar memoria
+    this.cleanupExpiredMemory();
+    this.cleanupExpiredLocalStorage();
+  }
+
+  private cleanupExpiredMemory(): void {
     for (const [key, item] of this.memoryCache.entries()) {
       if (this.isExpired(item)) {
         this.memoryCache.delete(key);
       }
     }
+  }
 
-    // Limpiar localStorage
-    if (typeof window !== 'undefined') {
-      const keys = Object.keys(localStorage);
-      for (const key of keys) {
-        if (key.startsWith('cache:')) {
-          try {
-            const item = JSON.parse(localStorage.getItem(key) || '');
-            if (this.isExpired(item)) {
-              localStorage.removeItem(key);
-            }
-          } catch {
-            // Si hay error al parsear, eliminar el item
+  private cleanupExpiredLocalStorage(): void {
+    if (typeof window === 'undefined') return;
+    const keys = Object.keys(localStorage);
+    for (const key of keys) {
+      if (key.startsWith('cache:')) {
+        try {
+          const item = JSON.parse(localStorage.getItem(key) || '');
+          if (this.isExpired(item)) {
             localStorage.removeItem(key);
           }
+        } catch {
+          localStorage.removeItem(key);
         }
       }
     }
@@ -137,32 +142,46 @@ class CacheManager {
         };
         localStorage.setItem(key, JSON.stringify(storageItem));
       } catch (error) {
-        console.warn('Error al guardar en localStorage:', error);
+        logger.warn('Error al guardar en localStorage:', 'CacheManager', error);
       }
     }
   }
 
   async invalidate(prefix: string, identifier?: string): Promise<void> {
     if (identifier) {
-      const key = this.generateKey(prefix, identifier);
-      this.memoryCache.delete(key);
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem(key);
-      }
+      this.invalidateByIdentifier(prefix, identifier);
     } else {
-      // Invalidar todos los items con el prefijo
-      for (const key of this.memoryCache.keys()) {
-        if (key.startsWith(prefix + ':')) {
-          this.memoryCache.delete(key);
-        }
-      }
+      this.invalidateByPrefix(prefix);
+    }
+  }
 
-      if (typeof window !== 'undefined') {
-        const keys = Object.keys(localStorage);
-        for (const key of keys) {
-          if (key.startsWith(prefix + ':')) {
-            localStorage.removeItem(key);
-          }
+  private invalidateByIdentifier(prefix: string, identifier: string): void {
+    const key = this.generateKey(prefix, identifier);
+    this.memoryCache.delete(key);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(key);
+    }
+  }
+
+  private invalidateByPrefix(prefix: string): void {
+    this.invalidateMemoryCacheByPrefix(prefix);
+    this.invalidateLocalStorageByPrefix(prefix);
+  }
+
+  private invalidateMemoryCacheByPrefix(prefix: string): void {
+    for (const key of this.memoryCache.keys()) {
+      if (key.startsWith(prefix + ':')) {
+        this.memoryCache.delete(key);
+      }
+    }
+  }
+
+  private invalidateLocalStorageByPrefix(prefix: string): void {
+    if (typeof window !== 'undefined') {
+      const keys = Object.keys(localStorage);
+      for (const key of keys) {
+        if (key.startsWith(prefix + ':')) {
+          localStorage.removeItem(key);
         }
       }
     }

@@ -9,6 +9,7 @@ import { FavoritesSort } from "./favorites-sort";
 import Link from "next/link";
 import { Music, Heart, Search } from "lucide-react";
 import type { Album } from "@/lib/types";
+import { removeDuplicateAlbums, filterAlbumsByQuery, sortAlbums } from "@/lib/album-utils";
 
 export function FavoritesList() {
   const { favorites, isLoading } = useFavorites();
@@ -17,43 +18,13 @@ export function FavoritesList() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   // Filtrado local
-  const filteredFavorites = useMemo(() => {
-    if (!searchQuery.trim()) return favorites;
-    const query = searchQuery.toLowerCase();
-    return favorites.filter(
-      (album) =>
-        album.title.toLowerCase().includes(query) ||
-        album.artist.toLowerCase().includes(query)
-    );
-  }, [favorites, searchQuery]);
+  const filteredFavorites = useMemo(() => filterAlbumsByQuery(favorites, searchQuery), [favorites, searchQuery]);
 
   // Ordenamiento local
-  const sortedFavorites = useMemo(() => {
-    const sorted = [...filteredFavorites];
-    sorted.sort((a, b) => {
-      let comparison = 0;
-      switch (sortField) {
-        case "title":
-          comparison = a.title.localeCompare(b.title);
-          break;
-        case "artist":
-          comparison = a.artist.localeCompare(b.artist);
-          break;
-        case "dateAdded":
-        default:
-          // No hay fecha, así que usamos el id como proxy
-          comparison = a.id.localeCompare(b.id);
-          break;
-      }
-      return sortOrder === "asc" ? comparison : -comparison;
-    });
-    return sorted;
-  }, [filteredFavorites, sortField, sortOrder]);
+  const sortedFavorites = useMemo(() => sortAlbums(filteredFavorites, sortField, sortOrder), [filteredFavorites, sortField, sortOrder]);
 
   // Elimina duplicados por id
-  const uniqueFavorites = useMemo(() => {
-    return Array.from(new Map(sortedFavorites.map(album => [album.id, album])).values());
-  }, [sortedFavorites]);
+  const uniqueFavorites = useMemo(() => removeDuplicateAlbums(sortedFavorites), [sortedFavorites]);
 
   if (isLoading) {
     return (

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { logger } from "@/lib/logger";
 
 interface EnhancedAudioPlayerProps {
   previewUrl: string | null;
@@ -45,7 +46,7 @@ export function EnhancedAudioPlayer({
       // Reproducir si isPlaying es true
       if (isPlaying) {
         audio.play().catch((error) => {
-          console.error('Error al reproducir audio:', error);
+          logger.error('Error al reproducir audio:', 'EnhancedAudioPlayer', error);
         });
       }
     }

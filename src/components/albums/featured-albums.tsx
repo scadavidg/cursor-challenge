@@ -6,6 +6,7 @@ import { LoaderCircle, Music } from "lucide-react";
 import { AlbumCard } from "./album-card";
 import type { Album } from "@/lib/types";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
+import { removeDuplicateAlbums, createAlbumLoadFunction } from "@/lib/album-utils";
 
 interface FeaturedAlbumsProps {
   title?: string;
@@ -17,16 +18,7 @@ export function FeaturedAlbums({
   description 
 }: FeaturedAlbumsProps = {}) {
   // Infinite scroll for all albums (paginated)
-  const loadMoreAlbums = useCallback(async (page: number) => {
-    const res = await fetch(`/api/albums/rock?page=${page}&limit=12`);
-    if (!res.ok) throw new Error('Error al cargar álbumes');
-    const result = await res.json();
-    return {
-      data: result.albums as Album[],
-      hasMore: result.albums.length === 12,
-      page: result.page
-    };
-  }, []);
+  const loadMoreAlbums = useCallback(createAlbumLoadFunction("/api/albums/rock"), []);
 
   const {
     data: albums,
@@ -46,7 +38,7 @@ export function FeaturedAlbums({
   }, [albums.length, isLoading, hasMore, loadMore]);
 
   // Filtrar álbumes duplicados por id
-  const uniqueAlbums = Array.from(new Map(albums.map(a => [a.id, a])).values());
+  const uniqueAlbums = removeDuplicateAlbums(albums);
 
   if (error) {
     return (

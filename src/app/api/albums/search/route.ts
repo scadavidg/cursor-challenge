@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { container } from "@/infrastructure/di/container";
 import { RockKeywordService } from '@/services/RockKeywordService';
+import { createApiResponse, createErrorResponse } from "@/lib/api-utils";
+import { sanitizeInput } from "@/lib/security";
 
 const ROCK_MESSAGES = [
   "¡Solo aceptamos rock! Intenta con algo más ruidoso 🤘",
@@ -18,7 +20,7 @@ const ROCK_MESSAGES = [
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const query = searchParams.get("query") || "";
+    const query = sanitizeInput(searchParams.get("query") || "");
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "12", 10);
     // Verificar si el término es de rock usando la base de datos
@@ -26,12 +28,12 @@ export async function GET(request: NextRequest) {
     if (!query.trim() || !isRock) {
       // Mensaje gracioso si no es rock
       const funMessage = ROCK_MESSAGES[Math.floor(Math.random() * ROCK_MESSAGES.length)];
-      return NextResponse.json({ albums: [], page, limit, funMessage });
+      return createApiResponse({ albums: [], page, limit, funMessage });
     }
     const albumUseCases = container.getAlbumUseCases();
     const albums = await albumUseCases.searchRockAlbums(query, page, limit);
-    return NextResponse.json({ albums, page, limit });
+    return createApiResponse({ albums, page, limit });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Error interno del servidor" }, { status: 500 });
+    return createErrorResponse(error, 500, 'Albums Search API');
   }
 } 
