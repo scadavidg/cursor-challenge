@@ -64,7 +64,11 @@ export class SpotifyService implements IExternalMusicService {
       limit,
       offset
     });
-    return data.albums;
+    const result = {
+      items: data.albums?.items || [],
+      total: data.albums?.total || 0
+    };
+    return result;
   }
 
   // Explorar álbumes de rock populares

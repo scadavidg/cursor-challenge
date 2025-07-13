@@ -56,7 +56,7 @@ export function AlbumSearch() {
     else setFunMessage(null);
     return {
       data: result.albums as Album[],
-      hasMore: result.albums.length === 12,
+      hasMore: result.hasMore, // Usar el valor real del backend
       page: result.page
     };
   }, [currentQuery]);

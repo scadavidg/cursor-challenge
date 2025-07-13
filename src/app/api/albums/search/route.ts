@@ -31,8 +31,9 @@ export async function GET(request: NextRequest) {
       return createApiResponse({ albums: [], page, limit, funMessage });
     }
     const albumUseCases = container.getAlbumUseCases();
-    const albums = await albumUseCases.searchRockAlbums(query, page, limit);
-    return createApiResponse({ albums, page, limit });
+    const result = await albumUseCases.searchRockAlbums(query, page, limit);
+    // Log eliminado
+    return createApiResponse({ albums: result.albums, page, limit, hasMore: result.hasMore });
   } catch (error) {
     return createErrorResponse(error, 500, 'Albums Search API');
   }
