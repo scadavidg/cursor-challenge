@@ -1,13 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AlbumSearch } from "@/components/albums/album-search";
 import { FeaturedAlbums } from "@/components/albums/featured-albums";
 import { Button } from "@/components/ui/button";
 import { Search, Music } from "lucide-react";
 
 export default function HomePage() {
-  const [activeTab, setActiveTab] = useState<'search' | 'explore'>('explore');
+  const [activeTab, setActiveTab] = useState<'search' | 'explore'>(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#explore') {
+      return 'explore';
+    }
+    return 'explore';
+  });
+
+  // Sincronizar con el hash de la URL
+  useEffect(() => {
+    const onHashChange = () => {
+      if (window.location.hash === '#explore') {
+        setActiveTab('explore');
+      }
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
 
   return (
     <div className="container mx-auto px-2 sm:px-4 animate-fade-in">
@@ -26,7 +42,10 @@ export default function HomePage() {
           <Button
             variant={activeTab === 'explore' ? 'default' : 'ghost'}
             size="sm"
-            onClick={() => setActiveTab('explore')}
+            onClick={() => {
+              setActiveTab('explore');
+              if (typeof window !== 'undefined') window.location.hash = '#explore';
+            }}
             className="flex items-center gap-2"
           >
             <Music className="h-4 w-4" />

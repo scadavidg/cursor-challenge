@@ -84,7 +84,12 @@ export function AlbumCard({ album, variant = "search" }: AlbumCardProps) {
   return (
     <>
       <Card 
-        className="flex flex-col overflow-hidden h-full transition-transform transform hover:-translate-y-1 hover:shadow-xl cursor-pointer"
+        className={
+          `flex flex-col overflow-hidden h-full transition-transform transform ` +
+          (variant === "favorite"
+            ? "hover:-translate-y-1 hover:shadow-xl cursor-pointer"
+            : "")
+        }
         onClick={variant === "favorite" ? handlePreview : undefined}
       >
       <CardHeader className="p-0">

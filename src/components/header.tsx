@@ -28,7 +28,7 @@ export function Header() {
   return (
     <header className="bg-card border-b sticky top-0 z-50">
       <div className="container mx-auto flex items-center justify-between p-4 px-2 sm:px-4">
-        <Link href="/home" className="flex items-center gap-2" aria-label="RockStack Home">
+        <Link href="/home" className="flex items-center gap-2" aria-label="RockStack Home" onClick={() => { if (typeof window !== 'undefined') window.location.hash = '#explore'; }}>
           <Music2 className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
           <span className="text-lg sm:text-2xl font-headline font-bold">
             RockStack{firstName ? ` ${firstName}` : ""}
@@ -40,7 +40,7 @@ export function Header() {
             variant="ghost" 
             size="sm" 
             className="text-xs sm:text-sm px-2 sm:px-4"
-            onClick={() => router.push('/home')}
+            onClick={() => { if (typeof window !== 'undefined') window.location.hash = '#explore'; router.push('/home'); }}
           >
             Inicio
           </Button>

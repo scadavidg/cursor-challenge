@@ -39,8 +39,8 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 60 * 60, // 1 hora (en segundos)
-    updateAge: 30 * 60, // 30 minutos (en segundos)
+    maxAge: 2 * 60 * 60, // 2 horas (en segundos)
+    updateAge: 60 * 60, // 1 hora (en segundos)
   },
   cookies: process.env.NODE_ENV === "development" ? {
     sessionToken: {

@@ -137,7 +137,7 @@ export function AlbumSearch() {
   return (
     <div>
       <Form {...form}>
-        <form className="relative max-w-2xl mx-auto mb-12">
+        <form className="relative max-w-2xl mx-auto mb-12" onSubmit={e => { e.preventDefault(); form.handleSubmit(onSubmit)(e); }}>
           <FormField
             control={form.control}
             name="query"
